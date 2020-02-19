@@ -3,7 +3,7 @@
 
   bitcoin-node =
     { config, pkgs, lib, ... }: {
-      imports = [ ../configuration.nix ];
+      imports = [ ../configuration.nix <nix-bitcoin/modules/nix-bitcoin.nix> ];
 
       deployment.keys = builtins.mapAttrs (n: v: {
         keyFile = "${toString ../secrets}/${n}";

@@ -1,13 +1,12 @@
 let
   nixpkgs = (import ./pkgs/nixpkgs-pinned.nix).nixpkgs;
 in
-with import nixpkgs { };
+with import nixpkgs {};
 
 stdenv.mkDerivation rec {
   name = "nix-bitcoin-environment";
 
   nixops19_09 = callPackage ./pkgs/nixops {};
-  make-secrets = callPackage ./pkgs/generate-secrets/update-and-generate.nix {};
 
   buildInputs = [ nixops19_09 figlet ];
 
@@ -18,7 +17,6 @@ stdenv.mkDerivation rec {
     # from 10.1.1.200 port 22:2: Too many authentication failures` if I have a few
     # keys already added to my ssh-agent.
     export SSH_AUTH_SOCK=""
-    figlet "nix-bitcoin"
-    (mkdir -p secrets; cd secrets; ${make-secrets})
+    figlet "nix-bitcoin dev shell"
   '';
 }
