@@ -10,6 +10,7 @@
   pylightning = pkgs.python3Packages.callPackage ./pylightning { };
   liquid-swap = pkgs.python3Packages.callPackage ./liquid-swap { };
   generate-secrets = pkgs.callPackage ./generate-secrets { };
+  nixops19_09 = pkgs.callPackage ./nixops { };
 
   pinned = import ./pinned.nix;
 }
