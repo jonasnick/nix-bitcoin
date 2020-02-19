@@ -4,8 +4,6 @@
 
 { config, pkgs, lib, ... }: {
   imports = [
-    ./modules/nix-bitcoin.nix
-
     # Use hardened kernel profile. See
     # https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/profiles/hardened.nix
     # for the enabled options.
