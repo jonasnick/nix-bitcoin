@@ -58,7 +58,7 @@ in {
     services.bitcoind.zmqpubrawblock = "tcp://127.0.0.1:28332";
     services.bitcoind.zmqpubrawtx = "tcp://127.0.0.1:28333";
     services.bitcoind.assumevalid = "00000000000000000000e5abc3a74fe27dc0ead9c70ea1deb456f11c15fd7bc6";
-    services.bitcoind.addnode = "ecoc5q34tmbq54wl.onion";
+    services.bitcoind.addnodes = [ "ecoc5q34tmbq54wl.onion" ];
     services.bitcoind.discover = false;
     services.bitcoind.addresstype = "bech32";
     services.bitcoind.prune = 0;
