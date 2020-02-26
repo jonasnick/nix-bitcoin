@@ -4,7 +4,6 @@
   bitcoin-node = { config, pkgs, lib, ... }: {
     imports = [
       ../configuration.nix
-      <nix-bitcoin/modules/nix-bitcoin.nix>
       <nix-bitcoin/modules/deployment/nixops.nix>
     ];
 
