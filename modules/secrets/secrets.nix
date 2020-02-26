@@ -15,6 +15,13 @@ in
       description = "Directory to store secrets";
     };
 
+    deployment.secretsDir = mkOption {
+      type = types.path;
+      description = ''
+        Directory of local secrets that are transfered to the nix-bitcoin node on deployment
+      '';
+    };
+
     secrets = mkOption {
       default = {};
       type = with types; attrsOf (submodule (
