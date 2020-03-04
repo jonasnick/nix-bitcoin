@@ -1,4 +1,4 @@
-{ lib, rustPlatform, clang, llvmPackages, fetchFromGitHub }:
+{ lib, rustPlatform, clang, llvmPackages, fetchFromGitHub, pkgs }:
 rustPlatform.buildRustPackage rec {
   pname = "electrs";
   version = "0.8.3";
@@ -14,7 +14,12 @@ rustPlatform.buildRustPackage rec {
   buildInputs = [ clang ];
   LIBCLANG_PATH = "${llvmPackages.libclang}/lib";
 
-  cargoSha256 = "19qs8if8fmygv6j74s6iwzm534fybwasjvmzdqcl996xhg75w6gi";
+  cargoSha256 = if pkgs ? cargo-vendor then
+    # nixpkgs ≤ 19.09
+    "19qs8if8fmygv6j74s6iwzm534fybwasjvmzdqcl996xhg75w6gi"
+  else
+    # for recent nixpkgs with cargo-native vendoring (introduced in nixpkgs PR #69274)
+    "1x88zj7p4i7pfb25ch1a54sawgimq16bfcsz1nmzycc8nbwbf493";
 
   meta = with lib; {
     description = "An efficient Electrum Server in Rust";
