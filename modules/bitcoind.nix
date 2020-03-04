@@ -135,7 +135,7 @@ in {
 
       rpcuser = mkOption {
           type = types.nullOr types.str;
-          default = null;
+          default = "bitcoinrpc";
           description = "Username for JSON-RPC connections";
       };
       rpcpassword = mkOption {
