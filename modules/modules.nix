@@ -1,15 +1,6 @@
 { config, pkgs, lib, ... }:
-let
-  nixpkgs-pinned = import ../pkgs/nixpkgs-pinned.nix;
-  unstable = import nixpkgs-pinned.nixpkgs-unstable {};
 
-  allPackages = pkgs: (import ../pkgs { inherit pkgs; }) // {
-    bitcoin = unstable.bitcoin.override { miniupnpc = null; };
-    bitcoind = unstable.bitcoind.override { miniupnpc = null; };
-    clightning = unstable.clightning;
-    lnd = unstable.lnd;
-  };
-in {
+{
   imports = [
     ./bitcoind.nix
     ./clightning.nix
@@ -37,7 +28,10 @@ in {
 
   config = {
     nixpkgs.overlays = [ (self: super: {
-      nix-bitcoin = allPackages super;
+      nix-bitcoin = let
+        pkgs = import ../pkgs { pkgs = super; };
+      in
+        pkgs // pkgs.pinned;
     }) ];
   };
 }
