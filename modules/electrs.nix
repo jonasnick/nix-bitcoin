@@ -49,6 +49,11 @@ in {
       default = 50002;
       description = "Port on which to listen for tor client connections.";
     };
+    extraArgs = mkOption {
+      type = types.separatedString " ";
+      default = "";
+      description = "Extra command line arguments passed to electrs.";
+    };
     TLSProxy = {
       enable = mkEnableOption "Nginx TLS proxy";
       port = mkOption {
@@ -81,7 +86,7 @@ in {
           ${pkgs.nix-bitcoin.electrs}/bin/electrs -vvv \
           ${optionalString (!cfg.high-memory) "--jsonrpc-import --index-batch-size=10"} \
           --db-dir '${cfg.dataDir}' --daemon-dir '${config.services.bitcoind.dataDir}' \
-          --electrum-rpc-addr=${toString cfg.address}:${toString cfg.port}
+          --electrum-rpc-addr=${toString cfg.address}:${toString cfg.port} ${cfg.extraArgs}
         '';
         User = cfg.user;
         Group = cfg.group;
