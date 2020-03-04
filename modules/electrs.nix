@@ -78,7 +78,8 @@ in {
           --db-dir '${cfg.dataDir}' --daemon-dir '${config.services.bitcoind.dataDir}' \
           --electrum-rpc-addr=127.0.0.1:${toString cfg.port}
         '';
-        User = "electrs";
+        User = cfg.user;
+        Group = cfg.group;
         Restart = "on-failure";
         RestartSec = "10s";
       } // nix-bitcoin-services.defaultHardening
