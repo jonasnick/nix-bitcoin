@@ -57,14 +57,6 @@ in {
   };
 
   config = mkIf cfg.enable {
-    users.users.${cfg.user} = {
-      description = "electrs User";
-      group = cfg.group;
-      extraGroups = [ "bitcoinrpc" "bitcoin"];
-      home = cfg.dataDir;
-    };
-    users.groups.${cfg.group} = {};
-
     systemd.services.electrs = {
       description = "Run electrs";
       wantedBy = [ "multi-user.target" ];
@@ -117,6 +109,15 @@ in {
       requires = [ "nix-bitcoin-secrets.target" ];
       after = [ "nix-bitcoin-secrets.target" ];
     };
+
+    users.users.${cfg.user} = {
+      description = "electrs User";
+      group = cfg.group;
+      extraGroups = [ "bitcoinrpc" "bitcoin"];
+      home = cfg.dataDir;
+    };
+    users.groups.${cfg.group} = {};
+
     nix-bitcoin.secrets = rec {
       nginx-key = {
         user = "nginx";
