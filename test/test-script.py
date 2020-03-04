@@ -39,6 +39,8 @@ assert_matches("su operator -c 'bitcoin-cli getnetworkinfo' | jq", '"version"')
 
 assert_running("electrs")
 machine.wait_for_open_port(4224)  # prometeus metrics provider
+# Check RPC connection to bitcoind
+machine.wait_until_succeeds(log_has_string("electrs", "NetworkInfo"))
 assert_running("nginx")
 # SSL stratum server via nginx. Only check for open port, no content is served here
 # as electrs isn't ready.
