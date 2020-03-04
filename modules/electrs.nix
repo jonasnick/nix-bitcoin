@@ -63,7 +63,7 @@ in {
 
   config = mkIf cfg.enable (mkMerge [{
     systemd.services.electrs = {
-      description = "Run electrs";
+      description = "Electrs Electrum Server";
       wantedBy = [ "multi-user.target" ];
       requires = [ "bitcoind.service" ];
       after = [ "bitcoind.service" ];
