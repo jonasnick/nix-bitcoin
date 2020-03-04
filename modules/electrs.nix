@@ -8,6 +8,10 @@ let
   index-batch-size = "${if cfg.high-memory then "" else "--index-batch-size=10"}";
   jsonrpc-import = "${if cfg.high-memory then "" else "--jsonrpc-import"}";
 in {
+  imports = [
+    (mkRenamedOptionModule [ "services" "electrs" "nginxport" ] [ "services" "electrs" "TLSProxy" "port" ])
+  ];
+
   options.services.electrs = {
     enable = mkOption {
       type = types.bool;
@@ -48,19 +52,22 @@ in {
       default = 50002;
       description = "Port on which to listen for tor client connections.";
     };
-    nginxport = mkOption {
+    TLSProxy = {
+      enable = mkEnableOption "Nginx TLS proxy";
+      port = mkOption {
         type = types.ints.u16;
         default = 50003;
         description = "Port on which to listen for TLS client connections.";
+      };
     };
     enforceTor = nix-bitcoin-services.enforceTor;
   };
 
-  config = mkIf cfg.enable {
+  config = mkIf cfg.enable (mkMerge [{
     systemd.services.electrs = {
       description = "Run electrs";
       wantedBy = [ "multi-user.target" ];
-      requires = [ "bitcoind.service" "nginx.service"];
+      requires = [ "bitcoind.service" ];
       after = [ "bitcoind.service" ];
       # create shell script to start up electrs safely with password parameter
       preStart = ''
@@ -83,16 +90,26 @@ in {
         );
     };
 
+    users.users.${cfg.user} = {
+      description = "electrs User";
+      group = cfg.group;
+      extraGroups = [ "bitcoinrpc" "bitcoin"];
+      home = cfg.dataDir;
+    };
+    users.groups.${cfg.group} = {};
+  }
+
+  (mkIf cfg.TLSProxy.enable {
     services.nginx = {
       enable = true;
       appendConfig = ''
         stream {
           upstream electrs {
-            server 127.0.0.1:${toString config.services.electrs.port};
+            server 127.0.0.1:${toString cfg.port};
           }
 
           server {
-            listen ${toString config.services.electrs.nginxport} ssl;
+            listen ${toString cfg.TLSProxy.port} ssl;
             proxy_pass electrs;
 
             ssl_certificate ${secretsDir}/nginx-cert;
@@ -105,19 +122,13 @@ in {
         }
       '';
     };
-    systemd.services.nginx = {
-      requires = [ "nix-bitcoin-secrets.target" ];
-      after = [ "nix-bitcoin-secrets.target" ];
+    systemd.services = {
+      electrs.wants = [ "nginx.service" ];
+      nginx = {
+        requires = [ "nix-bitcoin-secrets.target" ];
+        after = [ "nix-bitcoin-secrets.target" ];
+      };
     };
-
-    users.users.${cfg.user} = {
-      description = "electrs User";
-      group = cfg.group;
-      extraGroups = [ "bitcoinrpc" "bitcoin"];
-      home = cfg.dataDir;
-    };
-    users.groups.${cfg.group} = {};
-
     nix-bitcoin.secrets = rec {
       nginx-key = {
         user = "nginx";
@@ -125,5 +136,6 @@ in {
       };
       nginx-cert = nginx-key;
     };
-  };
+  })
+  ]);
 }

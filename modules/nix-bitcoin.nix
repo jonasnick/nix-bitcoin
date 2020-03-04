@@ -145,10 +145,11 @@ in {
     services.electrs.port = 50001;
     services.electrs.enforceTor = true;
     services.electrs.onionport = 50002;
-    services.electrs.nginxport = 50003;
+    services.electrs.TLSProxy.enable = true;
+    services.electrs.TLSProxy.port = 50003;
     services.tor.hiddenServices.electrs = {
       map = [{
-        port = config.services.electrs.onionport; toPort = config.services.electrs.nginxport;
+        port = config.services.electrs.onionport; toPort = config.services.electrs.TLSProxy.port;
       }];
       version = 3;
     };
