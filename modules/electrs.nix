@@ -34,6 +34,11 @@ in {
         If enabled, the electrs service will sync faster on high-memory systems (≥ 8GB).
       '';
     };
+    address = mkOption {
+      type = types.str;
+      default = "127.0.0.1";
+      description = "RPC listening address.";
+    };
     port = mkOption {
       type = types.ints.u16;
       default = 50001;
@@ -76,7 +81,7 @@ in {
           ${pkgs.nix-bitcoin.electrs}/bin/electrs -vvv \
           ${optionalString (!cfg.high-memory) "--jsonrpc-import --index-batch-size=10"} \
           --db-dir '${cfg.dataDir}' --daemon-dir '${config.services.bitcoind.dataDir}' \
-          --electrum-rpc-addr=127.0.0.1:${toString cfg.port}
+          --electrum-rpc-addr=${toString cfg.address}:${toString cfg.port}
         '';
         User = cfg.user;
         Group = cfg.group;
@@ -101,10 +106,18 @@ in {
   (mkIf cfg.TLSProxy.enable {
     services.nginx = {
       enable = true;
-      appendConfig = ''
+      appendConfig = let
+        address =
+          if cfg.address == "0.0.0.0" then
+            "127.0.0.1"
+          else if cfg.address == "::" then
+            "::1"
+          else
+            cfg.address;
+      in ''
         stream {
           upstream electrs {
-            server 127.0.0.1:${toString cfg.port};
+            server ${address}:${toString cfg.port};
           }
 
           server {
