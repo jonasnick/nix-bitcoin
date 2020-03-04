@@ -1,7 +1,6 @@
 { config, lib, pkgs, ... }:
 
 with lib;
-
 let
   cfg = config.services.electrs;
   inherit (config) nix-bitcoin-services;
@@ -36,18 +35,18 @@ in {
       type = types.bool;
       default = false;
       description = ''
-      If enabled, the electrs service will sync faster on high-memory systems (≥ 8GB).
+        If enabled, the electrs service will sync faster on high-memory systems (≥ 8GB).
       '';
     };
     port = mkOption {
-        type = types.ints.u16;
-        default = 50001;
-        description = "RPC port.";
+      type = types.ints.u16;
+      default = 50001;
+      description = "RPC port.";
     };
     onionport = mkOption {
-        type = types.ints.u16;
-        default = 50002;
-        description = "Port on which to listen for tor client connections.";
+      type = types.ints.u16;
+      default = 50002;
+      description = "Port on which to listen for tor client connections.";
     };
     nginxport = mkOption {
         type = types.ints.u16;
@@ -59,10 +58,10 @@ in {
 
   config = mkIf cfg.enable {
     users.users.${cfg.user} = {
-        description = "electrs User";
-        group = cfg.group;
-        extraGroups = [ "bitcoinrpc" "bitcoin"];
-        home = cfg.dataDir;
+      description = "electrs User";
+      group = cfg.group;
+      extraGroups = [ "bitcoinrpc" "bitcoin"];
+      home = cfg.dataDir;
     };
     users.groups.${cfg.group} = {};
 
@@ -76,7 +75,7 @@ in {
         mkdir -m 0770 -p ${cfg.dataDir}
         chown -R '${cfg.user}:${cfg.group}' ${cfg.dataDir}
         echo "${pkgs.nix-bitcoin.electrs}/bin/electrs -vvv ${index-batch-size} ${jsonrpc-import} --timestamp --db-dir ${cfg.dataDir} --daemon-dir /var/lib/bitcoind --cookie=${config.services.bitcoind.rpcuser}:$(cat ${secretsDir}/bitcoin-rpcpassword) --electrum-rpc-addr=127.0.0.1:${toString cfg.port}" > /run/electrs/startscript.sh
-        '';	
+      '';
       serviceConfig = rec {
         RuntimeDirectory = "electrs";
         RuntimeDirectoryMode = "700";
