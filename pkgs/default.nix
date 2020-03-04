@@ -4,7 +4,7 @@
   lightning-charge = pkgs.callPackage ./lightning-charge { };
   nanopos = pkgs.callPackage ./nanopos { };
   spark-wallet = pkgs.callPackage ./spark-wallet { };
-  electrs = (pkgs.callPackage ./electrs { }).rootCrate.build;
+  electrs = pkgs.callPackage ./electrs { };
   elementsd = pkgs.callPackage ./elementsd { withGui = false; };
   hwi = pkgs.callPackage ./hwi { };
   pylightning = pkgs.python3Packages.callPackage ./pylightning { };
