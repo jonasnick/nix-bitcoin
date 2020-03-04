@@ -73,7 +73,7 @@ in {
         chown -R '${cfg.user}:${cfg.group}' ${cfg.dataDir}
         echo "${pkgs.nix-bitcoin.electrs}/bin/electrs -vvv" \
              ${optionalString (!cfg.high-memory) "--jsonrpc-import --index-batch-size=10"} \
-             "--db-dir ${cfg.dataDir} --daemon-dir /var/lib/bitcoind" \
+             "--db-dir ${cfg.dataDir} --daemon-dir '${config.services.bitcoind.dataDir}'" \
              "--cookie=${config.services.bitcoind.rpcuser}:$(cat ${secretsDir}/bitcoin-rpcpassword)" \
              "--electrum-rpc-addr=127.0.0.1:${toString cfg.port}" > /run/electrs/startscript.sh
         '';
