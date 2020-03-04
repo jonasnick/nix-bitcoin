@@ -11,13 +11,7 @@ in {
   ];
 
   options.services.electrs = {
-    enable = mkOption {
-      type = types.bool;
-      default = false;
-      description = ''
-        If enabled, the electrs service will be installed.
-      '';
-    };
+    enable = mkEnableOption "electrs";
     dataDir = mkOption {
       type = types.path;
       default = "/var/lib/electrs";
