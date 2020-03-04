@@ -67,21 +67,23 @@ in {
       wantedBy = [ "multi-user.target" ];
       requires = [ "bitcoind.service" ];
       after = [ "bitcoind.service" ];
-      # create shell script to start up electrs safely with password parameter
       preStart = ''
         mkdir -m 0770 -p ${cfg.dataDir}
         chown -R '${cfg.user}:${cfg.group}' ${cfg.dataDir}
-        echo "${pkgs.nix-bitcoin.electrs}/bin/electrs -vvv" \
-             ${optionalString (!cfg.high-memory) "--jsonrpc-import --index-batch-size=10"} \
-             "--db-dir '${cfg.dataDir}' --daemon-dir '${config.services.bitcoind.dataDir}'" \
-             "--cookie=${config.services.bitcoind.rpcuser}:$(cat ${secretsDir}/bitcoin-rpcpassword)" \
-             "--electrum-rpc-addr=127.0.0.1:${toString cfg.port}" > /run/electrs/startscript.sh
+        echo "cookie = \"${config.services.bitcoind.rpcuser}:$(cat ${secretsDir}/bitcoin-rpcpassword)\"" \
+          > electrs.toml
         '';
-      serviceConfig = rec {
+      serviceConfig = {
         RuntimeDirectory = "electrs";
         RuntimeDirectoryMode = "700";
+        WorkingDirectory = "/run/electrs";
         PermissionsStartOnly = "true";
-        ExecStart = "${pkgs.bash}/bin/bash /run/${RuntimeDirectory}/startscript.sh";
+        ExecStart = ''
+          ${pkgs.nix-bitcoin.electrs}/bin/electrs -vvv \
+          ${optionalString (!cfg.high-memory) "--jsonrpc-import --index-batch-size=10"} \
+          --db-dir '${cfg.dataDir}' --daemon-dir '${config.services.bitcoind.dataDir}' \
+          --electrum-rpc-addr=127.0.0.1:${toString cfg.port}
+        '';
         User = "electrs";
         Restart = "on-failure";
         RestartSec = "10s";
