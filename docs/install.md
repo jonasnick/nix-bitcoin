@@ -84,33 +84,42 @@ You can also build Nix from source by following the instructions at https://nixo
     This eliminates an attack vector where nix's build server or binary cache is compromised.
 
 
-## 3. Nixops deployment
+## 3. Setup deployment directory
 
 1. Clone this project
 
     ```
     $ cd
     $ git clone https://github.com/fort-nix/nix-bitcoin
-    $ cd ~/nix-bitcoin
     ```
 
-2. Setup environment
+2. Create a new directory for your nix-bitcoin deployment and copy initial files from nix-bitcoin
+   ```
+   $ mkdir nix-bitcoin-node
+   $ cd nix-bitcoin-node
+   $ cp -r ../nix-bitcoin/examples/{configuration.nix,nixops,shell.nix} .
+   ```
+
+## 4. Deploy with NixOps
+
+1. Setup environment
 
     ```
     $ nix-shell
     ```
 
     This will set up your nix-bitcoin environment and might take a while without giving an output.
+    Note that a new directory `secrets/` appeared which contains the secrets for your node.
 
-3. Create nixops deployment in nix-shell.
+2. Create nixops deployment in nix-shell.
 
     ```
-    $ nixops create network/network.nix network/network-vbox.nix -d bitcoin-node
+    $ nixops create nixops/node.nix nixops/node-vbox.nix -d bitcoin-node
     ```
 
-4. Adjust configuration by opening `configuration.nix` and removing FIXMEs. Enable/disable the modules you want in `configuration.nix`.
+3. Adjust configuration by opening `configuration.nix` and removing FIXMEs. Enable/disable the modules you want in `configuration.nix`.
 
-5. Deploy Nixops in nix-shell
+4. Deploy Nixops in nix-shell
 
     ```
     $ nixops deploy -d bitcoin-node
@@ -118,7 +127,7 @@ You can also build Nix from source by following the instructions at https://nixo
 
     This will now create a nix-bitcoin node on the target machine.
 
-6. Nixops automatically creates an ssh key for use with `nixops ssh`. Access `bitcoin-node` through ssh in nix-shell with
+5. Nixops automatically creates an ssh key for use with `nixops ssh`. Access `bitcoin-node` through ssh in nix-shell with
 
     ```
     $ nixops ssh operator@bitcoin-node
@@ -128,7 +137,7 @@ See [usage.md](usage.md) for usage instructions, such as how to update.
 
 To resize the VM disk image, you can use this helper script from within nix-shell:
 ```
-$ ./helper/vbox-resize-disk1.sh --help
+$ ../nix-bitcoin/helper/vbox-resize-disk1.sh --help
 ```
 ----
 
@@ -320,24 +329,20 @@ This is borrowed from the [NixOS manual](https://nixos.org/nixos/manual/index.ht
     $ reboot
     ```
 
+
 ## 2. Nix installation
+Follow the [Nix installation](#2-nix-installation) instructions from the tutorial above (on the machine you are going to deploy from).
 
-Follow the instructions from [Nix installation on debian](#2-nix-installation) (on the machine you are going to deploy from).
 
-## 3. Nixops deployment
+## 3. Setup deployment directory
+Follow the [Setup deployment directory](#3-setup-deployment-directory) instructions from the tutorial above (on the machine you are going to deploy from).
 
-4. Clone this project
 
-    ```
-    $ cd
-    $ git clone https://github.com/fort-nix/nix-bitcoin
-    $ cd ~/nix-bitcoin
-    ```
-
-5. Create network file
+## 4. Deploy with NixOps
+1. Make sure you are in the deployment directory and create a nixops network file as follows
 
     ```
-    $ nano network/network-nixos.nix
+    $ nano nixops/node-nixos.nix
     ```
 
     ```
@@ -351,7 +356,7 @@ Follow the instructions from [Nix installation on debian](#2-nix-installation) (
 
     Replace 1.2.3.4 with NixOS machine's IP address.
 
-6. Edit `configuration.nix`
+2. Edit `configuration.nix`
 
     ```
     $ nano configuration.nix
@@ -359,14 +364,14 @@ Follow the instructions from [Nix installation on debian](#2-nix-installation) (
 
     Uncomment `./hardware-configuration.nix` line by removing #.
 
-7. Create `hardware-configuration.nix`
+3. Create `hardware-configuration.nix`
 
     ```
     $ nano hardware-configuration.nix
     ```
     Copy contents of NixOS machine's `/etc/nixos/hardware-configuration.nix` to file.
 
-8. Add boot option to `hardware-configuration.nix`
+4. Add boot option to `hardware-configuration.nix`
 
     Option 1: Enable systemd boot for UEFI
     ```
@@ -377,23 +382,24 @@ Follow the instructions from [Nix installation on debian](#2-nix-installation) (
     $ boot.loader.grub.device = "/dev/sda";
     ```
 
-9. Setup environment
+5. Setup environment
 
     ```
     $ nix-shell
     ```
 
     This will set up your nix-bitcoin environment and might take a while without giving an output.
+    Note that a new directory `secrets/` appeared which contains the secrets for your node.
 
-10. Create nixops deployment in nix-shell.
+6. Create nixops deployment in nix-shell.
 
     ```
-    $ nixops create network/network.nix network/network-nixos.nix -d bitcoin-node
+    $ nixops create nixops/node.nix nixops/node-nixos.nix -d bitcoin-node
     ```
 
-11. Adjust configuration by opening `configuration.nix` and removing FIXMEs. Enable/disable the modules you want in `configuration.nix`.
+7. Adjust configuration by opening `configuration.nix` and removing FIXMEs. Enable/disable the modules you want in `configuration.nix`.
 
-12. Deploy Nixops in nix-shell
+8. Deploy Nixops in nix-shell
 
     ```
     $ nixops deploy -d bitcoin-node
@@ -401,7 +407,7 @@ Follow the instructions from [Nix installation on debian](#2-nix-installation) (
 
     This will now create a nix-bitcoin node on the target machine.
 
-13. Nixops automatically creates an ssh key for use with `nixops ssh`. Access `bitcoin-node` through ssh in nix-shell with
+9. Nixops automatically creates an ssh key for use with `nixops ssh`. Access `bitcoin-node` through ssh in nix-shell with
 
     ```
     $ nixops ssh operator@bitcoin-node
