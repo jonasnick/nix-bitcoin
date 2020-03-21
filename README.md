@@ -2,7 +2,7 @@ nix-bitcoin
 ===
 
 Nix packages and nixos modules for easily installing Bitcoin nodes and higher layer protocols with an emphasis on security.
-This is a work in progress - don't expect it to be bug free or secure.
+This is a work in progress - don't expect it to be bug-free, secure or stable.
 
 The default configuration sets up a Bitcoin Core node and c-lightning. The user can enable spark-wallet in `configuration.nix` to make c-lightning accessible with a smartphone using spark-wallet.
 A simple webpage shows the lightning nodeid and links to nanopos letting the user receive donations.
@@ -21,6 +21,20 @@ The following screen cast shows a fresh deployment of a nix-bitcoin node.
 The goal is to make it easy to deploy a reasonably secure Bitcoin node with a usable wallet.
 It should allow managing bitcoin (the currency) effectively and providing public infrastructure.
 It should be a reproducible and extensible platform for applications building on Bitcoin.
+
+Example
+---
+The easiest way is to try out nix-bitcoin is to use one of the provided examples.
+This requires that you either have NixOS installed or another Linux distribution with [Nix](https://nixos.org/nix/) and [VirtualBox](https://www.virtualbox.org).
+
+```
+$ git clone https://github.com/fort-nix/nix-bitcoin
+$ cd examples/
+$ nix-shell
+```
+
+Now you can run `./deploy-nixops.sh` to install nix-bitcoin in a VirtualBox or `./deploy-container.sh` to install in a [NixOS container](https://github.com/erikarvstedt/extra-container).
+This will set up a nix-bitcoin according to `examples/configuration.nix` and then shut down immediately.
 
 Available modules
 ---
@@ -46,8 +60,6 @@ The data directories of the services can be found in `/var/lib` on the deployed 
 
 Installation
 ---
-The easiest way is to run `nix-shell` (on a Linux machine) in the nix-bitcoin directory and then create a [NixOps](https://nixos.org/nixops/manual/) deployment with the provided `network.nix` in the `network` directory.
-Fix the FIXMEs in configuration.nix and deploy with nixops in nix-shell.
 See [install.md](docs/install.md) for a detailed tutorial.
 
 Security
