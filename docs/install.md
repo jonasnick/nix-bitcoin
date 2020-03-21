@@ -320,42 +320,11 @@ This is borrowed from the [NixOS manual](https://nixos.org/nixos/manual/index.ht
     $ reboot
     ```
 
-## 2. nix-bitcoin installation
+## 2. Nix installation
 
-On the machine you are deploying from:
-You can also build Nix from source by following the instructions at https://nixos.org/nix/manual/#ch-installing-source.
+Follow the instructions from [Nix installation on debian](#2-nix-installation) (on the machine you are going to deploy from).
 
-1. Install Dependencies (Debian 9 stretch)
-
-    ```
-    $ sudo apt-get install curl git gnupg2 dirmngr
-    ```
-
-2. Install Latest Nix with GPG Verification
-
-    ```
-    $ curl -o install-nix https://nixos.org/nix/install
-    $ curl -o install-nix.sig https://nixos.org/nix/install.sig
-    $ gpg2 --recv-keys B541D55301270E0BCF15CA5D8170B4726D7198DE
-    $ gpg2 --verify ./install-nix.sig
-    $ sh ./install-nix --daemon
-    $ . /home/user/.nix-profile/etc/profile.d/nix.sh
-    ```
-
-    Then follow the instructions. Open a new terminal window when you're done.
-
-    If you get an error similar to
-    ```
-    error: cloning builder process: Operation not permitted
-    error: unable to start build process
-    /tmp/nix-binary-tarball-unpack.hqawN4uSPr/unpack/nix-2.2.1-x86_64-linux/install: unable to install Nix into your default profile
-    ```
-    you're likely not installing as multi-user because you forgot to pass the `--daemon` flag to the install script.
-
-3. Optional: Disallow substitutes
-
-    You can put `substitute = false` to your `nix.conf` usually found in `/etc/nix/` to build the packages from source.
-    This eliminates an attack vector where nix's build server or binary cache is compromised.
+## 3. Nixops deployment
 
 4. Clone this project
 
