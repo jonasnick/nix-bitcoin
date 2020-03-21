@@ -193,17 +193,19 @@ Tutorial: install and configure NixOS for nix-bitcoin on your own hardware
 
 This is borrowed from the [NixOS manual](https://nixos.org/nixos/manual/index.html#ch-installation). Look there for more information.
 
-1. Obtain latest NixOS. For example:
+1. Obtain latest [NixOS](https://nixos.org/nixos/download.html). For example:
 
 	```
-	wget https://releases.nixos.org/nixos/19.03/nixos-19.03.172538.7bb74e65365/nixos-minimal-19.03.172538.7bb74e65365-x86_64-linux.iso
+	wget https://releases.nixos.org/nixos/19.09/nixos-19.09.2284.bf7c0f0461e/nixos-minimal-19.09.2284.bf7c0f0461e-x86_64-linux.iso
+	sha256sum nixos-minimal-19.09.2284.bf7c0f0461e-x86_64-linux.iso
+	9768eb945bef410fccfb82cb3d2e7ce7c02c3430aed0f2f1527273cb080fff3e
 	```
 	Alternatively you can build NixOS from source by following the instructions at https://nixos.org/nixos/manual/index.html#sec-building-cd.
 
 2. Write NixOS iso to install media (USB/CD). For example:
 
 	```
-	dd if=nixos-minimal-19.03.172538.7bb74e65365-x86_64-linux.iso of=/dev/sdX
+	dd if=nixos-minimal-19.09.2284.bf7c0f0461e-x86_64-linux.iso of=/dev/sdX
 	```
 
 	Replace /dev/sdX with the correct device name. You can find this using `sudo fdisk -l`
@@ -402,7 +404,6 @@ You can also build Nix from source by following the instructions at https://nixo
 	boot.loader.grub.device = "/dev/sda";
 	```
 	Option 2: Set grub device for Legacy Boot (MBR)
-	```
 	```
 	boot.loader.grub.device = "/dev/sda";
 	```
