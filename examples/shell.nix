@@ -1,5 +1,5 @@
 let
-  # TODO:
+  # FIXME:
   # nix-bitcoin-path = builtins.fetchTarball {
   #   url = "https://github.com/fort-nix/nix-bitcoin/archive/master.tar.gz";
   #   sha256 = "1mlvfakjgbl67k4k9mgafp5gvi2gb2p57xwxwffqr4chx8g848n7";
