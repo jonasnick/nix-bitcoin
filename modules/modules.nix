@@ -14,6 +14,7 @@
     ./hardware-wallets.nix
     ./lnd.nix
     ./secrets/secrets.nix
+    ./netns-isolation.nix
   ];
 
   disabledModules = [ "services/networking/bitcoind.nix" ];
