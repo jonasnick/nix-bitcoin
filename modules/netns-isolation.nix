@@ -100,6 +100,11 @@ in {
           id = 15;
           connections = [ "bitcoind" ];
         };
+        electrs = {
+          id = 16;
+          connections = [ "bitcoind" ]
+          ++ ( optionals config.services.electrs.TLSProxy.enable [ "nginx" ]);
+        };
       };
 
       systemd.services = {
@@ -238,6 +243,13 @@ in {
         swap-cli = pkgs.writeScriptBin "liquidswap-cli" ''
           netns-exec nb-liquidd ${pkgs.nix-bitcoin.liquid-swap}/bin/liquidswap-cli -c '${config.services.liquidd.dataDir}/elements.conf' "$@"
         '';
+      };
+
+      # electrs: Custom netns configs
+      services.electrs = mkIf config.services.electrs.enable {
+        host =  if config.services.electrs.TLSProxy.enable then netns.nginx.address else netns.electrs.address;
+        address = netns.electrs.address;
+        daemonrpc = "${netns.bitcoind.address}:${toString config.services.bitcoind.rpc.port}";
       };
 
     })

@@ -17,6 +17,14 @@ in {
       default = "/var/lib/electrs";
       description = "The data directory for electrs.";
     };
+    # Needed until electrs tls proxy is removed
+    host = mkOption {
+      type = types.str;
+      default = "localhost";
+      description = ''
+        The host on which incoming connections arrive.
+      '';
+    };
     user = mkOption {
       type = types.str;
       default = "electrs";
@@ -43,6 +51,13 @@ in {
       type = types.port;
       default = 50001;
       description = "RPC port.";
+    };
+    daemonrpc = mkOption {
+      type = types.str;
+      default = "127.0.0.1:8332";
+      description = ''
+        Bitcoin daemon JSONRPC 'addr:port' to connect
+      '';
     };
     extraArgs = mkOption {
       type = types.separatedString " ";
@@ -97,7 +112,8 @@ in {
               "--jsonrpc-import --index-batch-size=10"
           } \
           --db-dir '${cfg.dataDir}' --daemon-dir '${config.services.bitcoind.dataDir}' \
-          --electrum-rpc-addr=${toString cfg.address}:${toString cfg.port} ${cfg.extraArgs}
+          --electrum-rpc-addr=${toString cfg.address}:${toString cfg.port} \
+          --daemon-rpc-addr=${toString cfg.daemonrpc} ${cfg.extraArgs}
         '';
         User = cfg.user;
         Group = cfg.group;
