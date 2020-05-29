@@ -36,7 +36,7 @@ with lib;
   nodejs = { MemoryDenyWriteExecute = "false"; };
   # Allow tor traffic. Allow takes precedence over Deny.
   allowTor = {
-    IPAddressAllow = "127.0.0.1/32 ::1/128";
+    IPAddressAllow = "127.0.0.1/32 ::1/128 169.254.0.0/16";
   };
   # Allow any traffic
   allowAnyIP = { IPAddressAllow = "any"; };
