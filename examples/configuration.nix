@@ -38,9 +38,10 @@
   # Enable this module to use clightning, a Lightning Network implementation
   # in C.
   services.clightning.enable = true;
-  # Enable this option to listen for incoming lightning connections. By
-  # default nix-bitcoin nodes offer outgoing connectivity.
-  # services.clightning.autolisten = true;
+  # Enable this option to announce our Tor Hidden Service. By default clightning
+  # offers outgoing functionality, but doesn't announce the Tor Hidden Service
+  # under which peers can reach us.
+  # services.clightning.announce-tor = true;
 
   ### LND
   # Disable clightning and uncomment the following line in order to enable lnd,
