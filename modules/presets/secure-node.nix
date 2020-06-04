@@ -24,6 +24,11 @@ in {
       default = 9735;
       description = "Port on which to listen for tor client connections.";
     };
+    services.lnd.onionport = mkOption {
+      type = types.ints.u16;
+      default = 9735;
+      description = "Port on which to listen for tor client connections.";
+    };
     services.electrs.onionport = mkOption {
       type = types.port;
       default = 50002;
@@ -83,7 +88,11 @@ in {
     services.tor.hiddenServices.clightning = mkHiddenService { port = cfg.clightning.onionport; toHost = (builtins.head (builtins.split ":" cfg.clightning.bind-addr)); };
 
     # lnd
-    services.lnd.enforceTor = true;
+    services.lnd = {
+      tor-socks = cfg.tor.client.socksListenAddress;
+      enforceTor = true;
+    };
+    services.tor.hiddenServices.lnd = mkHiddenService { port = cfg.lnd.onionport; };
 
     # liquidd
     services.liquidd = {

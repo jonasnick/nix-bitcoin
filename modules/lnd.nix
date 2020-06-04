@@ -5,6 +5,7 @@ with lib;
 let
   cfg = config.services.lnd;
   inherit (config) nix-bitcoin-services;
+  onion-chef-service = (if cfg.announce-tor then [ "onion-chef.service" ] else []);
   secretsDir = config.nix-bitcoin.secretsDir;
   configFile = pkgs.writeText "lnd.conf" ''
     datadir=${cfg.dataDir}
@@ -13,17 +14,17 @@ let
     tlscertpath=${secretsDir}/lnd-cert
     tlskeypath=${secretsDir}/lnd-key
 
-    rpclisten=localhost:${toString cfg.rpcPort}
-    restlisten=localhost:${toString cfg.restPort}
+    listen=${toString cfg.listen}
+    ${lib.concatMapStrings (rpclisten: "rpclisten=${rpclisten}:${toString cfg.rpcPort}\n") cfg.rpclisten}
+    ${lib.concatMapStrings (restlisten: "restlisten=${restlisten}:${toString cfg.restPort}\n") cfg.restlisten}
 
     bitcoin.active=1
     bitcoin.node=bitcoind
 
     tor.active=true
-    tor.v3=true
-    tor.streamisolation=true
-    tor.privatekeypath=${cfg.dataDir}/v3_onion_private_key
+    ${optionalString (cfg.tor-socks != null) "tor.socks=${cfg.tor-socks}"}
 
+    bitcoind.rpchost=${cfg.bitcoind-host}
     bitcoind.rpcuser=${config.services.bitcoind.rpcuser}
     bitcoind.zmqpubrawblock=${config.services.bitcoind.zmqpubrawblock}
     bitcoind.zmqpubrawtx=${config.services.bitcoind.zmqpubrawtx}
@@ -45,6 +46,25 @@ in {
       default = "/var/lib/lnd";
       description = "The data directory for LND.";
     };
+    listen = mkOption {
+      type = types.str;
+      default = "localhost";
+      description = "Bind to given address to listen to peer connections";
+    };
+    rpclisten = mkOption {
+      type = types.listOf types.str;
+      default = [ "localhost" ];
+      description = ''
+        Bind to given address to listen to RPC connections.
+      '';
+    };
+    restlisten = mkOption {
+      type = types.listOf types.str;
+      default = [ "localhost" ];
+      description = ''
+        Bind to given address to listen to REST connections.
+      '';
+    };
     rpcPort = mkOption {
       type = types.port;
       default = 10009;
@@ -54,6 +74,23 @@ in {
       type = types.port;
       default = 8080;
       description = "Port on which to listen for REST connections.";
+    };
+    bitcoind-host = mkOption {
+      type = types.str;
+      default = "127.0.0.1";
+      description = ''
+        The host that your local bitcoind daemon is listening on.
+      '';
+    };
+    tor-socks = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      description = "Set a socks proxy to use to connect to Tor nodes";
+    };
+    announce-tor = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Announce LND Tor Hidden Service";
     };
     extraConfig = mkOption {
       type = types.lines;
@@ -96,19 +133,21 @@ in {
     ];
 
     services.bitcoind = {
-      zmqpubrawblock = "tcp://127.0.0.1:28332";
-      zmqpubrawtx = "tcp://127.0.0.1:28333";
+      zmqpubrawblock = "tcp://${cfg.bitcoind-host}:28332";
+      zmqpubrawtx = "tcp://${cfg.bitcoind-host}:28333";
     };
 
+    services.onion-chef.access.lnd = if cfg.announce-tor then [ "lnd" ] else [];
     systemd.services.lnd = {
       description = "Run LND";
       path  = [ pkgs.nix-bitcoin.bitcoind ];
       wantedBy = [ "multi-user.target" ];
-      requires = [ "bitcoind.service" ];
-      after = [ "bitcoind.service" ];
+      requires = [ "bitcoind.service" ] ++ onion-chef-service;
+      after = [ "bitcoind.service" ] ++ onion-chef-service;
       preStart = ''
         install -m600 ${configFile} '${cfg.dataDir}/lnd.conf'
         echo "bitcoind.rpcpass=$(cat ${secretsDir}/bitcoin-rpcpassword)" >> '${cfg.dataDir}/lnd.conf'
+        ${optionalString cfg.announce-tor "echo externalip=$(cat /var/lib/onion-chef/lnd/lnd) >> '${cfg.dataDir}/lnd.conf'"}
       '';
       serviceConfig = nix-bitcoin-services.defaultHardening // {
         ExecStart = "${cfg.package}/bin/lnd --configfile=${cfg.dataDir}/lnd.conf";
