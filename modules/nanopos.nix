@@ -49,6 +49,26 @@ in {
         "The items file (see nanopos README).";
       '';
     };
+    charged-url = mkOption {
+      type = types.str;
+      default = "http://localhost:9112";
+      description = ''
+        "The lightning charge server url.";
+      '';
+    };
+    host = mkOption {
+      type = types.str;
+      default = "127.0.0.1";
+      description = ''
+        "http server listen address.";
+      '';
+    };
+    extraArgs = mkOption {
+      type = types.separatedString " ";
+      default = "";
+      description = "Extra command line arguments passed to nanopos.";
+    };
+    enforceTor =  nix-bitcoin-services.enforceTor;
   };
 
   config = mkIf cfg.enable {
@@ -59,6 +79,20 @@ in {
     ];
 
     environment.systemPackages = [ pkgs.nix-bitcoin.nanopos ];
+
+    services.nginx = {
+      enable = true;
+      virtualHosts."_" = {
+        root = "/var/www";
+        extraConfig = ''
+          location /store/ {
+            proxy_pass http://${toString cfg.host}:${toString cfg.port};
+            rewrite /store/(.*) /$1 break;
+          }
+        '';
+      };
+    };
+
     systemd.services.nanopos = {
       description = "Run nanopos";
       wantedBy = [ "multi-user.target" ];
@@ -66,12 +100,14 @@ in {
       after = [ "lightning-charge.service" ];
       serviceConfig = nix-bitcoin-services.defaultHardening // {
         EnvironmentFile = "${config.nix-bitcoin.secretsDir}/nanopos-env";
-        ExecStart = "${pkgs.nix-bitcoin.nanopos}/bin/nanopos -y ${cfg.itemsFile} -p ${toString cfg.port} --show-bolt11";
+        ExecStart = "${pkgs.nix-bitcoin.nanopos}/bin/nanopos -y ${cfg.itemsFile} -i ${toString cfg.host} -p ${toString cfg.port} -c ${toString cfg.charged-url} --show-bolt11 ${cfg.extraArgs}";
         User = "nanopos";
         Restart = "on-failure";
         RestartSec = "10s";
-      } // nix-bitcoin-services.nodejs
-        // nix-bitcoin-services.allowTor;
+      } // (if cfg.enforceTor
+            then nix-bitcoin-services.allowTor
+            else nix-bitcoin-services.allowAnyIP)
+        // nix-bitcoin-services.nodejs;
     };
     users.users.nanopos = {
       description = "nanopos User";
