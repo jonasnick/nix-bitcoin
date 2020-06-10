@@ -88,6 +88,10 @@ in {
         bitcoind = {
           id = 12;
         };
+        clightning = {
+          id = 13;
+          connections = [ "bitcoind" ];
+        };
       };
 
       systemd.services = {
@@ -181,9 +185,17 @@ in {
         '';
       };
 
+      # clightning: Custom netns configs
+      services.clightning = mkIf config.services.clightning.enable {
+        bitcoin-rpcconnect = netns.bitcoind.address;
+        bind-addr = "${netns.clightning.address}:${toString config.services.clightning.onionport}";
+      };
+
     })
     # Custom netns config option values if netns-isolation not enabled
     (mkIf (!cfg.enable) {
+      # clightning
+      services.clightning.bind-addr = "127.0.0.1:${toString config.services.clightning.onionport}";
     })
   ];
 }
