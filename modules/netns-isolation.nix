@@ -119,6 +119,11 @@ in {
           id = 19;
           connections = [ "nginx" "lightning-charge" ];
         };
+        recurring-donations = {
+          id = 20;
+          # communicates with clightning over lightning-rpc socket
+          connections = [];
+        };
       };
 
       systemd.services = {

@@ -132,6 +132,8 @@ in {
 
     services.nanopos.enforceTor = true;
 
+    services.recurring-donations.enforceTor = true;
+
     services.nix-bitcoin-webindex.enforceTor = true;
 
 
