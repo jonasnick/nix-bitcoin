@@ -21,6 +21,17 @@ in {
       default = "/var/lib/lightning-charge";
       description = "The data directory for lightning-charge.";
     };
+    host = mkOption {
+      type = types.str;
+      default = "127.0.0.1";
+      description = "http server listen address";
+    };
+    extraArgs = mkOption {
+      type = types.separatedString " ";
+      default = "";
+      description = "Extra command line arguments passed to lightning-charge.";
+    };
+    enforceTor =  nix-bitcoin-services.enforceTor;
   };
 
   config = mkIf cfg.enable {
@@ -60,13 +71,15 @@ in {
           # Needed to access clightning.dataDir in preStart
           PermissionsStartOnly = "true";
           EnvironmentFile = "${config.nix-bitcoin.secretsDir}/lightning-charge-env";
-          ExecStart = "${pkgs.nix-bitcoin.lightning-charge}/bin/charged -l ${config.services.clightning.dataDir}/bitcoin -d ${cfg.dataDir}/lightning-charge.db";
+          ExecStart = "${pkgs.nix-bitcoin.lightning-charge}/bin/charged -l ${config.services.clightning.dataDir}/bitcoin -d ${cfg.dataDir}/lightning-charge.db -i ${cfg.host} ${cfg.extraArgs}";
           User = user;
           Restart = "on-failure";
           RestartSec = "10s";
           ReadWritePaths = "${cfg.dataDir}";
-      } // nix-bitcoin-services.nodejs
-        // nix-bitcoin-services.allowTor;
+      } // (if cfg.enforceTor
+            then nix-bitcoin-services.allowTor
+            else nix-bitcoin-services.allowAnyIP)
+        // nix-bitcoin-services.nodejs;
     };
     nix-bitcoin.secrets.lightning-charge-env.user = user;
   };
