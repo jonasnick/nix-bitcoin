@@ -108,7 +108,7 @@ in {
       enforceTor = true;
       port = 7042;
     };
-    services.tor.hiddenServices.liquidd = mkHiddenService { port = cfg.liquidd.port; };
+    services.tor.hiddenServices.liquidd = mkHiddenService { port = cfg.liquidd.port; toHost = cfg.liquidd.bind; };
 
     # electrs
     services.electrs = {
