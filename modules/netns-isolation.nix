@@ -92,6 +92,10 @@ in {
           id = 13;
           connections = [ "bitcoind" ];
         };
+        lnd = {
+          id = 14;
+          connections = [ "bitcoind" ];
+        };
       };
 
       systemd.services = {
@@ -189,6 +193,20 @@ in {
       services.clightning = mkIf config.services.clightning.enable {
         bitcoin-rpcconnect = netns.bitcoind.address;
         bind-addr = "${netns.clightning.address}:${toString config.services.clightning.onionport}";
+      };
+
+      # lnd: Custom netns configs
+      services.lnd = mkIf config.services.lnd.enable {
+        listen = netns.lnd.address;
+        rpclisten = [
+          "${netns.lnd.address}"
+          "127.0.0.1"
+        ];
+        restlisten = [
+          "${netns.lnd.address}"
+          "127.0.0.1"
+        ];
+        bitcoind-host = netns.bitcoind.address;
       };
 
     })

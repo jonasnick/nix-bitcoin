@@ -92,7 +92,7 @@ in {
       tor-socks = cfg.tor.client.socksListenAddress;
       enforceTor = true;
     };
-    services.tor.hiddenServices.lnd = mkHiddenService { port = cfg.lnd.onionport; };
+    services.tor.hiddenServices.lnd = mkHiddenService { port = cfg.lnd.onionport; toHost = cfg.lnd.listen; };
 
     # liquidd
     services.liquidd = {
