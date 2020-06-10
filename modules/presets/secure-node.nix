@@ -79,9 +79,8 @@ in {
       proxy = cfg.tor.client.socksListenAddress;
       enforceTor = true;
       always-use-proxy = true;
-      bind-addr = "127.0.0.1:${toString cfg.clightning.onionport}";
     };
-    services.tor.hiddenServices.clightning = mkHiddenService { port = cfg.clightning.onionport; };
+    services.tor.hiddenServices.clightning = mkHiddenService { port = cfg.clightning.onionport; toHost = (builtins.head (builtins.split ":" cfg.clightning.bind-addr)); };
 
     # lnd
     services.lnd.enforceTor = true;
