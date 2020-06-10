@@ -7,7 +7,7 @@ let
   inherit (config) nix-bitcoin-services;
   onion-chef-service = (if cfg.onion-service then [ "onion-chef.service" ] else []);
   run-spark-wallet = pkgs.writeScript "run-spark-wallet" ''
-    CMD="${pkgs.nix-bitcoin.spark-wallet}/bin/spark-wallet --ln-path ${cfg.ln-path} -Q -k -c ${config.nix-bitcoin.secretsDir}/spark-wallet-login"
+    CMD="${pkgs.nix-bitcoin.spark-wallet}/bin/spark-wallet --ln-path ${cfg.ln-path} --host ${cfg.host} -Q -k -c ${config.nix-bitcoin.secretsDir}/spark-wallet-login ${cfg.extraArgs}"
     ${optionalString cfg.onion-service
       ''
       echo Getting onion hostname
@@ -29,6 +29,11 @@ in {
         If enabled, the spark-wallet service will be installed.
       '';
     };
+    host = mkOption {
+      type = types.str;
+      default = "localhost";
+      description = "http(s) server listen address.";
+    };
     ln-path = mkOption {
       type = types.path;
       default = "${config.services.clightning.dataDir}/bitcoin";
@@ -43,6 +48,12 @@ in {
         "If enabled, configures spark-wallet to be reachable through an onion service.";
       '';
     };
+    extraArgs = mkOption {
+      type = types.separatedString " ";
+      default = "";
+      description = "Extra command line arguments passed to spark-wallet.";
+    };
+    enforceTor =  nix-bitcoin-services.enforceTor;
   };
 
   config = mkIf cfg.enable {
@@ -65,7 +76,7 @@ in {
     services.tor.client.enable = true;
     services.tor.hiddenServices.spark-wallet = mkIf cfg.onion-service {
       map = [{
-        port = 80; toPort = 9737;
+        port = 80; toPort = 9737; toHost = cfg.host;
       }];
       version = 3;
     };
@@ -82,8 +93,10 @@ in {
         Restart = "on-failure";
         RestartSec = "10s";
         ReadWritePaths = "/var/lib/onion-chef";
-      } // nix-bitcoin-services.nodejs
-        // nix-bitcoin-services.allowTor;
+      } // (if cfg.enforceTor
+            then nix-bitcoin-services.allowTor
+            else nix-bitcoin-services.allowAnyIP)
+        // nix-bitcoin-services.nodejs;
     };
     nix-bitcoin.secrets.spark-wallet-login.user = "spark-wallet";
   };

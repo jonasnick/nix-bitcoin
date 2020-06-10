@@ -105,6 +105,11 @@ in {
           connections = [ "bitcoind" ]
           ++ ( optionals config.services.electrs.TLSProxy.enable [ "nginx" ]);
         };
+        spark-wallet = {
+          id = 17;
+          # communicates with clightning over lightning-rpc socket
+          connections = [];
+        };
       };
 
       systemd.services = {
@@ -250,6 +255,12 @@ in {
         host =  if config.services.electrs.TLSProxy.enable then netns.nginx.address else netns.electrs.address;
         address = netns.electrs.address;
         daemonrpc = "${netns.bitcoind.address}:${toString config.services.bitcoind.rpc.port}";
+      };
+
+      # spark-wallet: Custom netns configs
+      services.spark-wallet = mkIf config.services.spark-wallet.enable {
+        host = netns.spark-wallet.address;
+        extraArgs = "--no-tls";
       };
 
     })
