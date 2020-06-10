@@ -76,7 +76,6 @@ in {
 
     # clightning
     services.clightning = {
-      bitcoin-rpcuser = cfg.bitcoind.rpcuser;
       proxy = cfg.tor.client.socksListenAddress;
       enforceTor = true;
       always-use-proxy = true;

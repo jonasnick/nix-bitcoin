@@ -12,7 +12,7 @@ let
     ${optionalString (cfg.proxy != null) "proxy=${cfg.proxy}"}
     always-use-proxy=${if cfg.always-use-proxy then "true" else "false"}
     ${optionalString (cfg.bind-addr != null) "bind-addr=${cfg.bind-addr}"}
-    bitcoin-rpcuser=${cfg.bitcoin-rpcuser}
+    bitcoin-rpcuser=${config.services.bitcoind.rpcuser}
     rpc-file-mode=0660
   '';
 in {
@@ -53,12 +53,6 @@ in {
       type = types.bool;
       default = false;
       description = "Announce clightning Tor Hidden Service";
-    };
-    bitcoin-rpcuser = mkOption {
-      type = types.str;
-      description = ''
-        Bitcoin RPC user
-      '';
     };
     dataDir = mkOption {
       type = types.path;
