@@ -96,6 +96,10 @@ in {
           id = 14;
           connections = [ "bitcoind" ];
         };
+        liquidd = {
+          id = 15;
+          connections = [ "bitcoind" ];
+        };
       };
 
       systemd.services = {
@@ -213,6 +217,21 @@ in {
           netns-exec nb-lnd sudo -u lnd ${config.services.lnd.package}/bin/lncli --tlscertpath ${config.nix-bitcoin.secretsDir}/lnd-cert \
             --macaroonpath '${config.services.lnd.dataDir}/chain/bitcoin/mainnet/admin.macaroon' "$@"
         '';
+      };
+
+      # liquidd: Custom netns configs
+      services.liquidd = mkIf config.services.liquidd.enable {
+        bind = netns.liquidd.address;
+        rpcbind = [
+          "${netns.liquidd.address}"
+          "127.0.0.1"
+        ];
+        rpcallowip = [
+          "127.0.0.1"
+        ] ++ lib.lists.concatMap (s: [
+          "${netns.${s}.address}"
+        ]) netns.liquidd.availableNetns;
+        mainchainrpchost = netns.bitcoind.address;
       };
 
     })
