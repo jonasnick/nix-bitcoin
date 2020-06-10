@@ -110,6 +110,11 @@ in {
           # communicates with clightning over lightning-rpc socket
           connections = [];
         };
+        lightning-charge = {
+          id = 18;
+          # communicates with clightning over lightning-rpc socket
+          connections = [];
+        };
       };
 
       systemd.services = {
@@ -262,6 +267,9 @@ in {
         host = netns.spark-wallet.address;
         extraArgs = "--no-tls";
       };
+
+      # lightning-charge: Custom netns configs
+      services.lightning-charge.host = mkIf config.services.lightning-charge.enable netns.lightning-charge.address;
 
     })
     # Custom netns config option values if netns-isolation not enabled
