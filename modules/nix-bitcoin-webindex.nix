@@ -39,6 +39,11 @@ in {
         If enabled, the webindex service will be installed.
       '';
     };
+    host = mkOption {
+      type = types.str;
+      default = "localhost";
+      description = "HTTP server listen address.";
+    };
     enforceTor =  nix-bitcoin-services.enforceTor;
   };
 
@@ -61,9 +66,9 @@ in {
     };
     services.tor.hiddenServices.nginx = {
       map = [{
-        port = 80;
+        port = 80; toHost = cfg.host;
       } {
-        port = 443;
+        port = 443; toHost = cfg.host;
       }];
       version = 3;
     };

@@ -124,6 +124,10 @@ in {
           # communicates with clightning over lightning-rpc socket
           connections = [];
         };
+        nginx = {
+          id = 21;
+          connections = [];
+        };
       };
 
       systemd.services = {
@@ -285,6 +289,9 @@ in {
         charged-url = "http://${netns.lightning-charge.address}:9112";
         host = netns.nanopos.address;
       };
+
+      # nginx: Custom netns configs
+      services.nix-bitcoin-webindex.host = mkIf config.services.nix-bitcoin-webindex.enable netns.nginx.address;
 
     })
     # Custom netns config option values if netns-isolation not enabled
