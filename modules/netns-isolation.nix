@@ -115,6 +115,10 @@ in {
           # communicates with clightning over lightning-rpc socket
           connections = [];
         };
+        nanopos = {
+          id = 19;
+          connections = [ "nginx" "lightning-charge" ];
+        };
       };
 
       systemd.services = {
@@ -270,6 +274,12 @@ in {
 
       # lightning-charge: Custom netns configs
       services.lightning-charge.host = mkIf config.services.lightning-charge.enable netns.lightning-charge.address;
+
+      # nanopos: Custom netns configs
+      services.nanopos = mkIf config.services.nanopos.enable {
+        charged-url = "http://${netns.lightning-charge.address}:9112";
+        host = netns.nanopos.address;
+      };
 
     })
     # Custom netns config option values if netns-isolation not enabled
