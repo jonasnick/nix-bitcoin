@@ -85,6 +85,9 @@ in {
       };
 
       nix-bitcoin.netns-isolation.services = {
+        bitcoind = {
+          id = 12;
+        };
       };
 
       systemd.services = {
@@ -107,6 +110,8 @@ in {
             RemainAfterExit = "yes";
           };
         };
+
+        bitcoind-import-banlist.serviceConfig.NetworkNamespacePath = "/var/run/netns/nb-bitcoind";
       } //
       (let
         makeNetnsServices = n: v: let
@@ -158,6 +163,20 @@ in {
       in foldl (services: n:
         services // (makeNetnsServices n netns.${n})
       ) {} (builtins.attrNames netns));
+
+      # bitcoin: Custom netns configs
+      services.bitcoind = {
+        bind = netns.bitcoind.address;
+        rpcbind = [
+          "${netns.bitcoind.address}"
+          "127.0.0.1"
+        ];
+        rpcallowip = [
+          "127.0.0.1"
+        ] ++ lib.lists.concatMap (s: [
+          "${netns.${s}.address}"
+        ]) netns.bitcoind.availableNetns;
+      };
 
     })
     # Custom netns config option values if netns-isolation not enabled
