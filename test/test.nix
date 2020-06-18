@@ -16,6 +16,8 @@ import ./make-test.nix rec {
       # hardened
     ];
 
+    nix-bitcoin.netns-isolation.enable = mkForce true;
+
     services.bitcoind.extraConfig = mkForce "connect=0";
 
     services.clightning.enable = true;
