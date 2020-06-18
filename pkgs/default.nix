@@ -10,6 +10,7 @@
   liquid-swap = pkgs.python3Packages.callPackage ./liquid-swap { };
   generate-secrets = pkgs.callPackage ./generate-secrets { };
   nixops19_09 = pkgs.callPackage ./nixops { };
+  netns-exec = pkgs.callPackage ./netns-exec { };
 
   pinned = import ./pinned.nix;
 }
