@@ -257,11 +257,20 @@ in {
       };
       cli = mkOption {
         type = types.package;
+        default = cfg.cli-nonetns-exec;
+        description = "Binary to connect with the bitcoind instance.";
+      };
+      # Needed because bitcoind-import-banlist already executes inside
+      # nb-bitcoind, hence it doesn't need netns-exec prefixed.
+      cli-nonetns-exec = mkOption {
         readOnly = true;
+        type = types.package;
         default = pkgs.writeScriptBin "bitcoin-cli" ''
           exec ${cfg.package}/bin/bitcoin-cli -datadir='${cfg.dataDir}' "$@"
         '';
-        description = "Binary to connect with the bitcoind instance.";
+        description = ''
+          Binary to connect with the bitcoind instance without netns-exec.
+        '';
       };
       enforceTor =  nix-bitcoin-services.enforceTor;
     };
@@ -321,7 +330,7 @@ in {
       bindsTo = [ "bitcoind.service" ];
       after = [ "bitcoind.service" ];
       script = ''
-        cd ${cfg.cli}/bin
+        cd ${cfg.cli-nonetns-exec}/bin
         # Poll until bitcoind accepts commands. This can take a long time.
         while ! ./bitcoin-cli getnetworkinfo &> /dev/null; do
           sleep 1
