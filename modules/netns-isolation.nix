@@ -232,6 +232,12 @@ in {
           "${netns.${s}.address}"
         ]) netns.liquidd.availableNetns;
         mainchainrpchost = netns.bitcoind.address;
+        cli = pkgs.writeScriptBin "elements-cli" ''
+          netns-exec nb-liquidd ${pkgs.nix-bitcoin.elementsd}/bin/elements-cli -datadir='${config.services.liquidd.dataDir}' "$@"
+        '';
+        swap-cli = pkgs.writeScriptBin "liquidswap-cli" ''
+          netns-exec nb-liquidd ${pkgs.nix-bitcoin.liquid-swap}/bin/liquidswap-cli -c '${config.services.liquidd.dataDir}/elements.conf' "$@"
+        '';
       };
 
     })
