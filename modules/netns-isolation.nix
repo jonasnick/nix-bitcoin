@@ -207,6 +207,12 @@ in {
           "127.0.0.1"
         ];
         bitcoind-host = netns.bitcoind.address;
+        cli = pkgs.writeScriptBin "lncli"
+        # Switch user because lnd makes datadir contents readable by user only
+        ''
+          netns-exec nb-lnd sudo -u lnd ${config.services.lnd.package}/bin/lncli --tlscertpath ${config.nix-bitcoin.secretsDir}/lnd-cert \
+            --macaroonpath '${config.services.lnd.dataDir}/chain/bitcoin/mainnet/admin.macaroon' "$@"
+        '';
       };
 
     })

@@ -107,7 +107,6 @@ in {
       description = "The package providing lnd binaries.";
     };
     cli = mkOption {
-      readOnly = true;
       default = pkgs.writeScriptBin "lncli"
       # Switch user because lnd makes datadir contents readable by user only
       ''
