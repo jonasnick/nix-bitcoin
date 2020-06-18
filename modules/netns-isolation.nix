@@ -176,6 +176,9 @@ in {
         ] ++ lib.lists.concatMap (s: [
           "${netns.${s}.address}"
         ]) netns.bitcoind.availableNetns;
+        cli = pkgs.writeScriptBin "bitcoin-cli" ''
+          netns-exec nb-bitcoind ${config.services.bitcoind.package}/bin/bitcoin-cli -datadir='${config.services.bitcoind.dataDir}' "$@"
+        '';
       };
 
     })
