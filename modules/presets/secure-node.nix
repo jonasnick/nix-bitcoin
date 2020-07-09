@@ -85,14 +85,14 @@ in {
       enforceTor = true;
       always-use-proxy = true;
     };
-    services.tor.hiddenServices.clightning = mkHiddenService { port = cfg.clightning.onionport; toHost = (builtins.head (builtins.split ":" cfg.clightning.bind-addr)); };
+    services.tor.hiddenServices.clightning = mkIf cfg.clightning.enable (mkHiddenService { port = cfg.clightning.onionport; toHost = (builtins.head (builtins.split ":" cfg.clightning.bind-addr)); });
 
     # lnd
     services.lnd = {
       tor-socks = cfg.tor.client.socksListenAddress;
       enforceTor = true;
     };
-    services.tor.hiddenServices.lnd = mkHiddenService { port = cfg.lnd.onionport; toHost = cfg.lnd.listen; };
+    services.tor.hiddenServices.lnd = mkIf cfg.lnd.enable (mkHiddenService { port = cfg.lnd.onionport; toHost = cfg.lnd.listen; });
 
     # liquidd
     services.liquidd = {
@@ -108,7 +108,7 @@ in {
       enforceTor = true;
       port = 7042;
     };
-    services.tor.hiddenServices.liquidd = mkHiddenService { port = cfg.liquidd.port; toHost = cfg.liquidd.bind; };
+    services.tor.hiddenServices.liquidd = mkIf cfg.liquidd.enable (mkHiddenService { port = cfg.liquidd.port; toHost = cfg.liquidd.bind; });
 
     # electrs
     services.electrs = {
@@ -117,11 +117,11 @@ in {
       TLSProxy.enable = true;
       TLSProxy.port = 50003;
     };
-    services.tor.hiddenServices.electrs = mkHiddenService {
+    services.tor.hiddenServices.electrs = mkIf cfg.electrs.enable (mkHiddenService {
       port = cfg.electrs.onionport;
       toPort = if cfg.electrs.TLSProxy.enable then cfg.electrs.TLSProxy.port else cfg.electrs.port;
       toHost = cfg.electrs.host;
-    };
+    });
 
     services.spark-wallet = {
       onion-service = true;
