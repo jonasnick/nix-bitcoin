@@ -1,5 +1,12 @@
 # Integration test, can be run without internet access.
 
+{ scenario ? "default" }:
+
+let
+  netns-isolation = builtins.getAttr scenario { default = false; withnetns = true; };
+  testScriptFilename = builtins.getAttr scenario { default = ./scenarios/default.py; withnetns = ./scenarios/withnetns.py; };
+in
+
 import ./make-test.nix rec {
   name = "nix-bitcoin";
 
@@ -16,7 +23,7 @@ import ./make-test.nix rec {
       # hardened
     ];
 
-    nix-bitcoin.netns-isolation.enable = mkForce true;
+    nix-bitcoin.netns-isolation.enable = mkForce netns-isolation;
 
     services.bitcoind.extraConfig = mkForce "connect=0";
 
@@ -48,6 +55,5 @@ import ./make-test.nix rec {
       install -o nobody -g nogroup -m777 <(:) /secrets/dummy
     '';
   };
-
-  testScript = builtins.readFile ./test-script.py;
+  testScript = builtins.readFile ./scenarios/lib.py + "\n\n" + builtins.readFile testScriptFilename;
 }

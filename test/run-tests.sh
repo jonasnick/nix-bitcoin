@@ -5,18 +5,51 @@
 #
 # Usage:
 #   Run test
-#   ./run-tests.sh
+#   ./run-tests.sh --scenario <scenario>
 #
 #   Run test and save result to avoid garbage collection
-#   ./run-tests.sh build --out-link /tmp/nix-bitcoin-test
+#   ./run-tests.sh --scenario <scenario> build --out-link /tmp/nix-bitcoin-test
 #
 #   Run interactive test debugging
-#   ./run-tests.sh debug
+#   ./run-tests.sh --scenario <scenario> debug
 #
 #   This starts the testing VM and drops you into a Python REPL where you can
 #   manually execute the tests from ./test-script.py
 
 set -eo pipefail
+
+die() {
+    printf '%s\n' "$1" >&2
+    exit 1
+}
+
+# Initialize all the option variables.
+# This ensures we are not contaminated by variables from the environment.
+scenario=
+
+while :; do
+    case $1 in
+	--scenario)
+	    if [ "$2" ]; then
+		scenario=$2
+		shift
+	    else
+		die 'ERROR: "--scenario" requires a non-empty option argument.'
+	    fi
+	    ;;
+	-?*)
+	    printf 'WARN: Unknown option (ignored): %s\n' "$1" >&2
+	    ;;
+	*)
+	    break
+    esac
+
+    shift
+done
+
+if [[ -z $scenario ]]; then
+    die 'ERROR: "--scenario" is required'
+fi
 
 numCPUs=${numCPUs:-$(nproc)}
 # Min. 800 MiB needed to avoid 'out of memory' errors
@@ -32,7 +65,7 @@ run() {
     export TMPDIR=$(mktemp -d /tmp/nix-bitcoin-test.XXX)
     trap "rm -rf $TMPDIR" EXIT
 
-    nix-build --out-link $TMPDIR/driver "$scriptDir/test.nix" -A driver
+    nix-build --out-link $TMPDIR/driver -E "import \"$scriptDir/test.nix\" { scenario = \"$scenario\"; }" -A driver
 
     # Variable 'tests' contains the Python code that is executed by the driver on startup
     if [[ $1 == --interactive ]]; then
@@ -95,7 +128,7 @@ exprForCI() {
 
 vmTestNixExpr() {
   cat <<EOF
-    (import "$scriptDir/test.nix" {}).overrideAttrs (old: rec {
+    (import "$scriptDir/test.nix" { scenario = "$scenario"; } {}).overrideAttrs (old: rec {
       buildCommand = ''
         export QEMU_OPTS="-smp $numCPUs -m $memoryMiB"
         echo "VM stats: CPUs: $numCPUs, memory: $memoryMiB MiB"
