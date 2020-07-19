@@ -58,25 +58,25 @@ machine.wait_until_succeeds(log_has_string("bitcoind-import-banlist", "Importing
 assert_no_failure("bitcoind-import-banlist")
 
 ### Security tests
+bitcoind_ip = "169.254.1.12"
+clightning_ip = "169.254.1.13"
+lnd_ip = "169.254.1.14"
+liquidd_ip = "169.254.1.15"
+electrs_ip = "169.254.1.16"
+sparkwallet_ip = "169.254.1.17"
+lightningcharge_ip = "169.254.1.18"
+nanopos_ip = "169.254.1.19"
+recurringdonations_ip = "169.254.1.20"
+nginx_ip = "169.254.1.21"
 
 # Positive ping tests (non-exhaustive)
 machine.succeed(
-    "bitcoindip='169.254.1.12' && \
-    clightningip='169.254.1.13' && \
-    lndip='169.254.1.14' && \
-    liquiddip='169.254.1.15' && \
-    electrsip='169.254.1.16' && \
-    sparkwalletip='169.254.1.17' && \
-    lightningchargeip='169.254.1.18' && \
-    nanoposip='169.254.1.19' && \
-    recurringdonationsip='169.254.1.20' && \
-    nginxip='169.254.1.21' && \
-    ip netns exec nb-bitcoind ping -c 1 -w 1 $bitcoindip && \
-    ip netns exec nb-bitcoind ping -c 1 -w 1 $clightningip && \
-    ip netns exec nb-bitcoind ping -c 1 -w 1 $liquiddip && \
-    ip netns exec nb-nanopos ping -c 1 -w 1 $lightningchargeip && \
-    ip netns exec nb-nanopos ping -c 1 -w 1 $nanoposip && \
-    ip netns exec nb-nanopos ping -c 1 -w 1 $nginxip"
+    "ip netns exec nb-bitcoind ping -c 1 -w 1 %s &&" % bitcoind_ip
+    + "ip netns exec nb-bitcoind ping -c 1 -w 1 %s &&" % clightning_ip
+    + "ip netns exec nb-bitcoind ping -c 1 -w 1 %s &&" % liquidd_ip
+    + "ip netns exec nb-nanopos ping -c 1 -w 1 %s &&" % lightningcharge_ip
+    + "ip netns exec nb-nanopos ping -c 1 -w 1 %s &&" % nanopos_ip
+    + "ip netns exec nb-nanopos ping -c 1 -w 1 %s" % nginx_ip
 )
 
 # Negative ping tests (non-exhaustive)
