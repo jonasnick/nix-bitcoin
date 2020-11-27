@@ -1,0 +1,26 @@
+name: continuous-integration
+
+on:
+  push:
+  pull_request:
+
+env:
+  global:
+    # CACHIX_SIGNING_KEY
+  - secure: "xXCFZ7g+k5YmCGm8R8l3bZElVmt+RD1KscG3kGr5w4HyyDPTzFetPo+sT8bUpysDU0u3HWhfVhHtpog2mhNhwVl3tQwKXea3dHKC1i6ypBg3gjDngmJRR5wo++ocYDpK8qPaU7m/jHQTNFnTA4CbmMcc05GcYx/1Ai/ZGkNwWFjdIcVeOUoiol33gykMOXIGDg2qlXudt33wP53FHbX8L4fxzodWfAuxKK4AoGprxy5eSnU7LCaXxxJmu4HwuV+Ux2U1NfE/E33cvhlUvTQCswVSZFG06mg8rwhMG1ozsDvlL2itZlu/BeUQH5y3XMMlnJIUXUazkRBibf1w/ebVjpOF+anqkqmq8tcbFEa7T+RJeVTIsvP+L8rE8fcmuZtdg9hNmgRnLmaeT0vVwD1L2UqW9HdRyujdoS0jPYuoc1W7f1JQWfAPhBPQ1SrtKyNNqcbVJ34aN7b+4vCzRpQL1JTbmjzQIWhkiKN1qMo1v/wbIydW8yka4hc4JOfdQLaAJEPI1eAC1MLotSAegMnwKWE1dzm66MuPSipksYjZrvsB28cV4aCVUffIuRhrSr1i2afRHwTpNbK9U4/576hah15ftUdR79Sfkcoi1ekSQTFGRvkRIPYtkKLYwFa3jVA41qz7+IIZCf4TsApy3XDdFx91cRub7yPq9BeZ83A+qYQ="
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      run: |
+        curl -L https://nixos.org/nix/install | sh
+        . /home/travis/.nix-profile/etc/profile.d/nix.sh
+        if [[ $STABLE == 1 ]]; then export NIX_PATH="nixpkgs=$(nix eval --raw -f pkgs/nixpkgs-pinned.nix nixpkgs)"; fi
+        if [[ $STABLE == 0 ]]; then export NIX_PATH="nixpkgs=$(nix eval --raw -f pkgs/nixpkgs-pinned.nix nixpkgs-unstable)"; fi
+        nix-env -iA cachix -f https://cachix.org/api/v1/install
+        cachix use nix-bitcoin
+        VER="$(nix eval nixpkgs.lib.version)"
+        echo $VER
+        nix --version
