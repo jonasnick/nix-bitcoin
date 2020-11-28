@@ -10,23 +10,31 @@ env:
 jobs:
   setup:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+       include:
+         - foo
+           pkg: "hwi"
+           stable: 1
+         - bar
+           pkg: "hwi"
+           stable: 0
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
-      - run: |
-          curl -L https://nixos.org/nix/install | sh
-          . /home/runner/.nix-profile/etc/profile.d/nix.sh
-          if [[ $STABLE == 1 ]]; then export NIX_PATH="nixpkgs=$(nix eval --raw -f pkgs/nixpkgs-pinned.nix nixpkgs)"; fi
-          if [[ $STABLE == 0 ]]; then export NIX_PATH="nixpkgs=$(nix eval --raw -f pkgs/nixpkgs-pinned.nix nixpkgs-unstable)"; fi
-          nix-env -iA cachix -f https://cachix.org/api/v1/install
-          cachix use nix-bitcoin
-          VER="$(nix eval nixpkgs.lib.version)"
-          echo $VER
-          nix --version
-  build:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          ls -al /home/runner
-          echo "ver: $VER"
+        env:
+      - name: Echo site details
+          PKG: ${{ matrix.site }}
+          STABLE: ${{ matrix.stable }}
+        run: echo $PKG $STABLE
+      - name: install nix
+        - run: |
+            curl -L https://nixos.org/nix/install | sh
+            . /home/runner/.nix-profile/etc/profile.d/nix.sh
+            if [[ $STABLE == 1 ]]; then export NIX_PATH="nixpkgs=$(nix eval --raw -f pkgs/nixpkgs-pinned.nix nixpkgs)"; fi
+            if [[ $STABLE == 0 ]]; then export NIX_PATH="nixpkgs=$(nix eval --raw -f pkgs/nixpkgs-pinned.nix nixpkgs-unstable)"; fi
+            nix-env -iA cachix -f https://cachix.org/api/v1/install
+            cachix use nix-bitcoin
+            VER="$(nix eval nixpkgs.lib.version)"
+            echo $VER
+            nix --version
