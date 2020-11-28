@@ -33,12 +33,12 @@ jobs:
           if [[ $STABLE == 0 ]]; then export NIX_PATH="nixpkgs=$(nix eval --raw -f pkgs/nixpkgs-pinned.nix nixpkgs-unstable)"; fi
           nix-env -iA cachix -f https://cachix.org/api/v1/install
           cachix use nix-bitcoin
-          VER="$(nix eval nixpkgs.lib.version)"
+          export VER="$(nix eval nixpkgs.lib.version)"
           echo $VER
           nix --version
       - name: script
         run: |
-          printf '%s (%s)\n' "$NIX_PATH" "$VER"
+          printf '%s (%s)\n' "${env:NIX_PATH}" "${env:VER}"
           getBuildExpr() {
             if [[ $TestModules ]]; then
               if [[ ! -e /dev/kvm ]]; then
