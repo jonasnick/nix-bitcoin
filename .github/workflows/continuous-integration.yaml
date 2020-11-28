@@ -50,3 +50,21 @@ jobs:
           }
           buildExpr=$(getBuildExpr)
           time nix-instantiate -E "$buildExpr" --add-root ./drv --indirect
+          outPath=$(nix-store --query ./drv)
+          if nix path-info --store https://nix-bitcoin.cachix.org $outPath &>/dev/null; then
+              echo "$outPath" has already been built successfully.
+              travis_terminate 0
+          fi
+          # Travis doesn't expose secrets to pull-request builds,
+          # so skip cache uploading in this case
+          if [[ $CACHIX_SIGNING_KEY ]]; then
+              cachix push nix-bitcoin --watch-store &
+              cachixPid=$!
+          fi
+          nix-build ./drv
+          if [[ $CACHIX_SIGNING_KEY ]]; then
+            # Wait until cachix has finished uploading
+            # Run as root because yama/ptrace_scope != 0
+            ruby=$(nix-build '<nixpkgs>' -A ruby)/bin/ruby
+            time sudo $ruby helper/wait-for-network-idle.rb $cachixPid
+          fi
