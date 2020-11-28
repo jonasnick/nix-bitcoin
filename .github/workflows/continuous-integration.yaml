@@ -31,9 +31,9 @@ jobs:
           if [[ $STABLE == 0 ]]; then export NIX_PATH="nixpkgs=$(nix eval --raw -f pkgs/nixpkgs-pinned.nix nixpkgs-unstable)"; fi
           nix-env -iA cachix -f https://cachix.org/api/v1/install
           cachix use nix-bitcoin
-          export VER="$(nix eval nixpkgs.lib.version)"
-          echo "::set-env name=VER::$VER"
-          echo $VER
+          VER="$(nix eval nixpkgs.lib.version)"
+          echo "VER=$VER" >> $GITHUB_ENV
+          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
           nix --version
       - name: script
         run: |
