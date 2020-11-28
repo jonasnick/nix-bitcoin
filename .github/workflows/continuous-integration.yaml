@@ -13,10 +13,10 @@ jobs:
     strategy:
       matrix:
        include:
-         - foo
+         - foo: 1
            pkg: "hwi"
            stable: 1
-         - bar
+         - bar: 2
            pkg: "hwi"
            stable: 0
     steps:
