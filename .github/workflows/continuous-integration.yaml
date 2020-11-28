@@ -14,7 +14,7 @@ jobs:
     steps:
       - run: |
           curl -L https://nixos.org/nix/install | sh
-          . /home/travis/.nix-profile/etc/profile.d/nix.sh
+          . /home/runner/.nix-profile/etc/profile.d/nix.sh
           if [[ $STABLE == 1 ]]; then export NIX_PATH="nixpkgs=$(nix eval --raw -f pkgs/nixpkgs-pinned.nix nixpkgs)"; fi
           if [[ $STABLE == 0 ]]; then export NIX_PATH="nixpkgs=$(nix eval --raw -f pkgs/nixpkgs-pinned.nix nixpkgs-unstable)"; fi
           nix-env -iA cachix -f https://cachix.org/api/v1/install
