@@ -51,3 +51,4 @@ jobs:
             fi
           }
           buildExpr=$(getBuildExpr)
+          time nix-instantiate -E "$buildExpr" --add-root ./drv --indirect
