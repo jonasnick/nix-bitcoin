@@ -37,7 +37,7 @@ jobs:
           echo $VER
           nix --version
 
-          printf '%s (%s)\n' "${env:NIX_PATH}" "${env:VER}"
+          printf '%s (%s)\n' "$NIX_PATH" "$VER"
           getBuildExpr() {
             if [[ $TestModules ]]; then
               if [[ ! -e /dev/kvm ]]; then
