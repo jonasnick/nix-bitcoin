@@ -20,12 +20,10 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
-      - name: Echo envs
+      - name: install nix
         env:
           PKG: ${{ matrix.pkg }}
           STABLE: ${{ matrix.stable }}
-        run: echo $PKG $STABLE
-      - name: install nix
         run: |
           curl -L https://nixos.org/nix/install | sh
           . /home/runner/.nix-profile/etc/profile.d/nix.sh
