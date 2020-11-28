@@ -46,7 +46,8 @@ jobs:
           buildExpr=$(getBuildExpr)
           time nix-instantiate -E "$buildExpr" --add-root ./drv --indirect
           outPath=$(nix-store --query ./drv)
-          if nix path-info --store https://nix-bitcoin.cachix.org $outPath &>/dev/null; then
+          #if nix path-info --store https://nix-bitcoin.cachix.org $outPath &>/dev/null; then
+          if false; then
               echo "$outPath" has already been built successfully.
           else
             # Travis doesn't expose secrets to pull-request builds,
