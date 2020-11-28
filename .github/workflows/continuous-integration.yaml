@@ -32,9 +32,11 @@ jobs:
           nix-env -iA cachix -f https://cachix.org/api/v1/install
           cachix use nix-bitcoin
           export VER="$(nix eval nixpkgs.lib.version)"
+          echo "::set-env name=VER::$VER"
           echo $VER
           nix --version
-
+      - name: script
+        run: |
           printf '%s (%s)\n' "$NIX_PATH" "$VER"
           getBuildExpr() {
             if [[ $TestModules ]]; then
