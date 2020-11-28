@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@v2
         env:
       - name: Echo site details
-          PKG: ${{ matrix.site }}
+          PKG: ${{ matrix.pkg }}
           STABLE: ${{ matrix.stable }}
         run: echo $PKG $STABLE
       - name: install nix
