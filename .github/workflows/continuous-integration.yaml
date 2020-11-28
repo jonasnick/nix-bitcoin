@@ -36,8 +36,7 @@ jobs:
           export VER="$(nix eval nixpkgs.lib.version)"
           echo $VER
           nix --version
-      - name: script
-        run: |
+
           printf '%s (%s)\n' "${env:NIX_PATH}" "${env:VER}"
           getBuildExpr() {
             if [[ $TestModules ]]; then
