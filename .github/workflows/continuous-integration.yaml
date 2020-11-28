@@ -10,9 +10,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - testmodules=1
-            stable=1
-            scenario="default"
+          - testmodules: 1
+            stable: 1
+            scenario: "default"
           - pkg: "hwi"
             stable: 1
           - pkg: "hwi"
