@@ -28,5 +28,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-        ls -al /home/runner
-        echo "ver: $VER"
+          ls -al /home/runner
+          echo "ver: $VER"
