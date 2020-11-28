@@ -30,7 +30,6 @@ jobs:
           cachix use nix-bitcoin
           VER="$(nix eval nixpkgs.lib.version)"
           nix --version
-        run: |
           printf '%s (%s)\n' "$NIX_PATH" "$VER"
           getBuildExpr() {
             if [[ $TestModules ]]; then
