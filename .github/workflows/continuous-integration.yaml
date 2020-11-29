@@ -48,7 +48,10 @@ jobs:
               echo "(import ./. {}).$PKG"
             fi
           }
+          nix show-config
+          mkdir -p /etc/nix/
           echo "system-features = nixos-test benchmark big-parallel kvm" >> /etc/nix/nix.conf
+          nix show-config
           buildExpr=$(getBuildExpr)
           time nix-instantiate -E "$buildExpr" --add-root ./drv --indirect
           outPath=$(nix-store --query ./drv)
