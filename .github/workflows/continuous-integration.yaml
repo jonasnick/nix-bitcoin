@@ -49,8 +49,7 @@ jobs:
             fi
           }
           nix show-config
-          mkdir -p /etc/nix/
-          echo "system-features = nixos-test benchmark big-parallel kvm" >> /etc/nix/nix.conf
+          echo "system-features = nixos-test benchmark big-parallel kvm" >> /home/runner/.config/nix/nix.conf
           nix show-config
           buildExpr=$(getBuildExpr)
           time nix-instantiate -E "$buildExpr" --add-root ./drv --indirect
