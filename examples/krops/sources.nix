@@ -1,7 +1,19 @@
 { extraSources, krops }:
 
 krops.lib.evalSource [({
-  nixos-config.file = toString ../krops-configuration.nix;
+  nixos-config.symlink = "krops/krops-configuration.nix";
+
+  # Only include krops-configuration.nix from krops dir
+  "krops".file = {
+    path = toString ../krops;
+    filters = [{
+      type = "include";
+      pattern = "krops-configuration.nix";
+    }{
+      type = "exclude";
+      pattern = "*";
+    }];
+  };
 
   "configuration.nix".file = toString ../configuration.nix;
 

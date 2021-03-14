@@ -1,6 +1,6 @@
 {
   imports = [
-    ./configuration.nix
+    ../configuration.nix
     <nix-bitcoin/modules/deployment/krops.nix>
   ];
 }

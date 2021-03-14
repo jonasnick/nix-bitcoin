@@ -53,7 +53,6 @@ let
     nixpkgs.symlink = toString <nixpkgs>;
 
     nixos-config.file = toString <krops-vm-configuration.nix>;
-    "krops-configuration.nix".file = toString ./krops-configuration.nix;
 
     qemu-vm.file = toString <qemu-vm>;
   };
