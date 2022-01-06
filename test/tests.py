@@ -127,6 +127,14 @@ def _():
 def _():
     assert_running("clightning")
     assert_matches("runuser -u operator -- lightning-cli getinfo | jq", '"id"')
+
+    if test_data["clightning-replication"]:
+        assert_running("clightning-replication-mounts")
+        replica_db = "/var/lib/clightning-replication/plaintext/lightningd.sqlite3"
+        succeed(f"runuser -u clightning -- ls {replica_db}")
+        # No other user should be able to read the unencrypted files
+        machine.fail(f"runuser -u bitcoin -- ls {replica_db}")
+
     if test_data["clightning-plugins"]:
         plugin_list = succeed("lightning-cli plugin list")
         plugins = json.loads(plugin_list)["plugins"]
