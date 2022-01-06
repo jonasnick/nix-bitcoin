@@ -40,6 +40,15 @@ let
       default = "${cfg.dataDir}/${network}";
       description = "The network data directory.";
     };
+    wallet = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      example = "sqlite3:///var/lib/clightning/bitcoin/lightningd.sqlite3";
+      description = ''
+        Wallet data scheme (sqlite3 or postgres) and location/connection
+        parameters, as fully qualified data source name.
+      '';
+    };
     extraConfig = mkOption {
       type = types.lines;
       default = "";
@@ -105,6 +114,7 @@ let
     bitcoin-rpcuser=${config.services.bitcoind.rpc.users.public.name}
     rpc-file-mode=0660
     log-timestamps=false
+    ${optionalString (cfg.wallet != null) "wallet=${cfg.wallet}"}
     ${cfg.extraConfig}
   '';
 
