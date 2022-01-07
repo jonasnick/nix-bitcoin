@@ -55,10 +55,29 @@ name: testConfig:
   container = {
     # The container name has a 11 char length limit
     containers.nb-test = { config, ... }: {
-      config = {
-        extra = config.config.test.container;
-        config = testConfig;
-      };
+      imports = [
+        {
+          config = {
+            extra = config.config.test.container;
+            config = testConfig;
+          };
+        }
+
+        # Enable FUSE inside the container when clightning replication
+        # is enabled.
+        # TODO-EXTERNAL: Remove this when
+        # https://github.com/systemd/systemd/issues/17607
+        # has been resolved. This will also improve security.
+        (
+          let
+            clightning = config.config.services.clightning;
+          in
+            lib.mkIf (clightning.enable && clightning.replication.enable) {
+              bindMounts."/dev/fuse" = { hostPath = "/dev/fuse"; };
+              allowedDevices = [ { node = "/dev/fuse"; modifier = "rw"; } ];
+            }
+        )
+      ];
     };
   };
 
