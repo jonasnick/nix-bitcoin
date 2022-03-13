@@ -93,6 +93,10 @@ NixOS modules ([src](modules/modules.nix))
 
 Security
 ---
+See [SECURITY.md](SECURITY.md) for the security policy and how to report a vulnerability.
+
+nix-bitcoin aims to achieve a high degree of security by building on the following principles:
+
 * **Simplicity:** Only services enabled in `configuration.nix` and their dependencies are installed, support for [doas](https://github.com/Duncaen/OpenDoas) ([sudo alternative](https://lobste.rs/s/efsvqu/heap_based_buffer_overflow_sudo_cve_2021#c_c6fcfa)), code is continuously reviewed and refined.
 * **Integrity:** The Nix package manager guarantees that all dependencies are exactly specified, packages can be built from source to reduce reliance on binary caches, nix-bitcoin merge commits are signed, all commits are approved by multiple nix-bitcoin developers, upstream packages are cryptographically verified where possible, we use this software ourselves.
 * **Principle of Least Privilege:** Services operate with least privileges; they each have their own user and are restricted further with [systemd features](pkgs/lib.nix), [RPC whitelisting](modules/bitcoind-rpc-public-whitelist.nix) and [netns-isolation](modules/netns-isolation.nix). There's a non-root user *operator* to interact with the various services.
