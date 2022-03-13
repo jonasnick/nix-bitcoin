@@ -1,4 +1,24 @@
-# nix-bitcoin security fund
+# Security Policy
+
+## Reporting a Vulnerability
+To report security issues send an email to the following nix-bitcoin developers or contact them via [matrix](https://matrix.org/).
+
+| Name          | GPG Fingerprint                                    | Email                   | Matrix                                                                             |
+|---------------|----------------------------------------------------|-------------------------|------------------------------------------------------------------------------------|
+| Jonas Nick    | 36C7 1A37 C9D9 88BD E825  08D9 B1A7 0E4F 8DCD 0366 | jonasd.nick@gmail.com   | [@nickler:nixbitcoin.org](https://matrix.to/#/@nickler:nixbitcoin.org)             |
+| Erik Arvstedt | 4E28 0A8C 1B33 4C86 C26B  C134 3331 2B94 4DD9 7846 | erik.arvstedt@gmail.com | [@erikarvstedt:matrix.org](https://matrix.to/#/@erikarvstedt:matrix.org)           |
+| nixbitcoindev | 577A 3452 7F3E 2A85 E80F  E164 DD11 F9AD 5308 B3BA | nixbitcoin@i2pmail.org  | [@nixbitcoindev:nixbitcoin.org](https://matrix.to/#/@nixbitcoindev:nixbitcoin.org) |
+
+You can import a GPG key by running the following command with that individual’s fingerprint: `gpg --keyserver hkps://keys.openpgp.org --recv-keys "<fingerprint>"`. Ensure that you put quotes around fingerprints containing spaces.
+
+[Responsible disclosures](https://en.wikipedia.org/wiki/Coordinated_vulnerability_disclosure) may qualify for a reward from the nix-bitcoin security fund (see [below](#nix-bitcoin-security-fund)).
+
+## Wall of Fame
+
+*empty*
+
+
+## nix-bitcoin security fund
 
 The nix-bitcoin security fund is a collection of funds held on the following 2/3
 bitcoin multisig address which is used to reward security researchers who
@@ -10,14 +30,10 @@ amounts.
 bc1qrpnz05n0yznaj6yw82wy8dhwuqz86s87vdlhq4cu92fus9qal25s555wsy
 ```
 
-The following nix-bitcoin developers each hold one key to the multisig address
+The nix-bitcoin developers [listed above](#reporting-a-vulnerability) each hold one key to the multisig address
 and collectively form the nix-bitcoin developer quorum:
 
-- Jonas Nick (0xB1A70E4F8DCD0366) [@nickler:nixbitcoin.org](https://matrix.to/#/@nickler:nixbitcoin.org)
-- Erik Arvstedt (0x33312B944DD97846) [@erikarvstedt:matrix.org](https://matrix.to/#/@erikarvstedt:matrix.org)
-- nixbitcoindev (0xDD11F9AD5308B3BA) [@nixbitcoindev:nixbitcoin.org](https://matrix.to/#/@nixbitcoindev:nixbitcoin.org)
-
-## Eligible Vulnerabilities
+### Eligible Vulnerabilities
 
 The following types of vulnerabilities qualify for rewards, to the
 exclusion of all other security vulnerabilities.
@@ -30,7 +46,7 @@ exclusion of all other security vulnerabilities.
 | Bad Documentation | Our documentation suggests blatantly insecure things | `install.md` tells you to add our ssh keys to your root user |
 | Compromise of Signing Key | Compromise of the nix-bitcoin signing key, i.e., `0xB1A70E4F8DCD0366` | Leaking the key, managing to sign something with it |
 
-## Reward
+### Reward
 
 Researchers qualify for a maximum reward of 10% of the total fund holdings \* for
 reporting any vulnerability that matches the above eligibility requirements. If
@@ -55,12 +71,14 @@ obscurity of the victim's required configuration, as well as simple mitigation (
 the attack should have been mitigated anyway by common-sense security measures)
 or complex/unlikely attack execution.
 
-## Policy
+### Policy
 
 * Reponsible Disclosure: Vulnerabilities must be [responsibly
   disclosed](https://en.wikipedia.org/wiki/Coordinated_vulnerability_disclosure)
 * E2EE: Vulnerabilities must be disclosed via end-to-end encrypted communication
   methods, such as PGP E-Mail or Matrix
+* Wall of Fame: In addition to the above rewards, security researchers will also
+  be added to the Wall of Fame, unless, of course, they wish to remain anonymous.
 * First come, first serve: Rewards are awarded strictly on a first come, first
   serve basis from the date they were responsibly disclosed in their entirety.
   Multiple reports from the same researcher can either be bundled for a higher
@@ -81,7 +99,3 @@ or complex/unlikely attack execution.
 * The fund's holdings can be used for purposes not mentioned in this
   document.
 
-## Wall of Fame
-
-In addition to the above rewards, security researchers will also be added
-to this Wall of Fame, unless, of course, they wish to remain anonymous.
