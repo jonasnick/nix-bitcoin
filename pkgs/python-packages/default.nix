@@ -20,7 +20,17 @@ in {
   joinmarketdaemon = joinmarketPkg ./jmdaemon;
 
   pyln-client = clightningPkg ./pyln-client;
-  pyln-proto = clightningPkg ./pyln-proto;
+  # pyln-proto requires version of cryptography that's newer than that for
+  # joinmarket and newer than in the stable packages.
+  # pyln-proto needs to be built with unstable poetry2nix because the stable one fails when
+  # building coincurve.
+  pyln-proto = (pkg: callPackage pkg {
+    inherit (nbPkgs.pinned.pkgsUnstable) poetry2nix;
+    inherit (nbPkgs.pinned.pkgsUnstable) python3;
+    inherit (nbPkgs.pinned) clightning;
+    inherit (nbPkgs.pinned.pkgsUnstable.python3Packages) cryptography;
+    inherit (nbPkgs.pinned.pkgsUnstable.python3Packages) pycparser;
+    inherit (nbPkgs.pinned.pkgsUnstable.python3Packages) cffi;}) ./pyln-proto;
   pyln-bolt7 = clightningPkg ./pyln-bolt7;
   pylightning = clightningPkg ./pylightning;
 

@@ -1,38 +1,32 @@
-{ buildPythonPackage, clightning
-, bitstring
-, cryptography
-, coincurve
-, base58
-, mypy
+{ poetry2nix
+, fetchzip
+, python3
+, clightning
+, cffi
 , pycparser
-, setuptools-scm
+, coincurve
+, cryptography
 }:
 
-buildPythonPackage rec {
-  pname = "pyln-proto";
-  version = clightning.version;
-
-  inherit (clightning) src;
-
-  propagatedBuildInputs = [
-    bitstring
-    cryptography
-    coincurve
-    pycparser
-    base58
-    mypy
-    setuptools-scm
-  ];
-
-  SETUPTOOLS_SCM_PRETEND_VERSION = version;
-
-  postUnpack = "sourceRoot=$sourceRoot/contrib/pyln-proto";
-  postPatch = ''
-    sed -i '
-      s|pycparser==2.20|pycparser~=2.20|
-      s|coincurve ~= 13.0|coincurve == 15.0.0|
-      s|base58 ~= 2.0.1|base58 == 2.1.0|
-      s|mypy==0.790|mypy == 0.812|
-    ' requirements.txt
-  '';
+let
+  s = fetchzip { url = "file://" + clightning.src; hash = "sha256-PV4QCFWuAkt6X4DShpyYtyTwgFX08NTbJ62MU9eXauI="; };
+in
+poetry2nix.mkPoetryApplication {
+  poetrylock = ./poetry.lock;
+  projectDir = s + "/contrib/pyln-proto";
+  src = s + "/contrib/pyln-proto";
+    overrides = poetry2nix.overrides.withDefaults (self: super: {
+      # workaround for https://github.com/nix-community/poetry2nix/issues/568
+      pyparsing = super.pyparsing.overridePythonAttrs (old: {
+        buildInputs = old.buildInputs or [ ] ++ [ python3.pkgs.flit-core ];
+      });
+      # When poetry2nix builds this, I get error
+      #   Found duplicated packages in closure for dependency  'cffi': ...
+      #   Found duplicated packages in closure for dependency  'pycparser': ...
+      inherit cffi;
+      inherit pycparser;
+      # building cryptography requires a lot of tooling (rust?) and fails when
+      # built through poetry2nix
+      inherit cryptography;
+   });
 }
