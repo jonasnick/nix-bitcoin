@@ -28,11 +28,11 @@ systemctl show bitcoind
 
 # Setup clightning database replication
 
-Clightning can write an additional, replica database to a SSHFS (remote
-filesystem over SSH) destination or a local directory path. The local directory
-can also be used to write to custom targets mounted at that path, like external
-HDD's, or NFS/SMB shares. Backups can also be automatically encrypted using
-gocryptfs.
+Clightning can write an additional, replica database to a local directory. The
+local directory can also be used to write to custom targets mounted at that
+path, like external HDD's, or NFS/SMB shares. Nix-bitcoin has built-in support
+for replicating to a remote filesystem over SSH (using SSHFS). Backups can also
+be automatically encrypted using gocryptfs.
 
 Note: You should also backup `hsm_secret` (located at
 `/var/lib/clightning/bitcoin/hsm_secret` in most cases) separately, manually
@@ -52,7 +52,7 @@ and/or using the `services.backups` module.
     ```
 
     Leave out the `encrypt` line if you want to store data on your destination
-    in plaintext.
+    in plaintext and adjust `user`, `hostname` and `directory` as necessary.
 
 2. Deploy new `configuration.nix`
 
@@ -90,6 +90,10 @@ and/or using the `services.backups` module.
       extraGroups = [ "sftponly" ];
     };
     ```
+
+    If the `<user>` is set to `nb-replication` and the targets hostname is
+    `hostname`, then the corresponding `sshfs.destination` on the nix-bitcoin
+    node is `"nb-replication@hostname:/var/backup/nb-replication/writeable"`.
 
 ## Local Directory
 
