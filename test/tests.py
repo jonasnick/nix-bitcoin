@@ -134,6 +134,7 @@ def _():
         succeed(f"runuser -u clightning -- ls {replica_db}")
         # No other user should be able to read the unencrypted files
         machine.fail(f"runuser -u bitcoin -- ls {replica_db}")
+        succeed("runuser -u clightning -- gocryptfs -info /var/backup/clightning/lightningd-db/")
 
     if test_data["clightning-plugins"]:
         plugin_list = succeed("lightning-cli plugin list")

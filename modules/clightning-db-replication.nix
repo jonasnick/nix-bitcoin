@@ -127,6 +127,8 @@ in {
       }
     ];
 
+    environment.systemPackages = optionals cfg.encrypt [ pkgs.gocryptfs ];
+
     systemd.tmpfiles.rules = optional (localDir != null && cfg.local.setupDirectory)
       "d '${localDir}' 0770 ${user} ${group} - -";
 
