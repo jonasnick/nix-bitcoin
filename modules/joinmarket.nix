@@ -264,16 +264,16 @@ let
    # The jm scripts create a 'logs' dir in the working dir,
    # so run them inside dataDir.
    cli = pkgs.runCommand "joinmarket-cli" {} ''
-     mkdir -p "$out/bin"
+     mkdir -p $out/bin
      jm=${nbPkgs.joinmarket}/bin
-     cd "$jm"
+     cd $jm
      for bin in jm-*; do
        {
          echo "#!${pkgs.bash}/bin/bash";
          echo "cd '${cfg.dataDir}' && ${cfg.cliExec} ${runAsUser} ${cfg.user} "$jm/$bin" --datadir='${cfg.dataDir}' \"\$@\"";
        } > "$out/bin/$bin"
      done
-     chmod -R +x "$out/bin"
+     chmod -R +x $out/bin
    '';
 in {
   inherit options;
@@ -314,7 +314,7 @@ in {
       '';
       postStart = ''
         walletname=wallet.jmdat
-        wallet="${cfg.dataDir}/wallets/$walletname"
+        wallet=${cfg.dataDir}/wallets/$walletname
         if [[ ! -f $wallet ]]; then
           ${optionalString (cfg.rpcWalletFile != null) ''
             echo "Create watch-only wallet ${cfg.rpcWalletFile}"
